@@ -22,12 +22,12 @@ module.exports = (env) ->
 
   # Include you own depencies with nodes global require function:
   #  
-  #     someThing = require 'someThing'
+  hap = env.require 'hap-nodejs'
   #  
 
   # ###MyPlugin class
   # Create a class that extends the Plugin class and implements the following functions:
-  class MyPlugin extends env.plugins.Plugin
+  class HapPlugin extends env.plugins.Plugin
 
     # ####init()
     # The `init` function is called by the framework to ask your plugin to initialise.
@@ -40,10 +40,10 @@ module.exports = (env) ->
     #     
     # 
     init: (app, @framework, @config) =>
-      env.logger.info("Hello World")
+      env.logger.info("Starting homekit bridge")
 
   # ###Finally
   # Create a instance of my plugin
-  myPlugin = new MyPlugin
+  plugin = new HapPlugin()
   # and return it to the framework.
-  return myPlugin
+  return plugin
