@@ -22,7 +22,7 @@ module.exports = (env) ->
 
   # Include you own depencies with nodes global require function:
   #  
-  hap = env.require 'hap-nodejs'
+  hap = require 'hap-nodejs'
   #  
 
   # ###MyPlugin class
@@ -41,6 +41,12 @@ module.exports = (env) ->
     # 
     init: (app, @framework, @config) =>
       env.logger.info("Starting homekit bridge")
+      @framework.on 'deviceAdded', (device) =>
+        env.logger.info("found device " + device.name)
+        if device instanceof env.devices.SwitchActuator
+          for attrName, attr of device.attributes
+            env.logger.info("device " + device.name + " has attribute " + attrName)
+
 
   # ###Finally
   # Create a instance of my plugin
