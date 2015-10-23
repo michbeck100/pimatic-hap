@@ -1,27 +1,13 @@
-# #Plugin template
 
-# This is an plugin template and mini tutorial for creating pimatic plugins. It will explain the 
-# basics of how the plugin system works and how a plugin should look like.
-
-# ##The plugin code
-
-# Your plugin must export a single function, that takes one argument and returns a instance of
-# your plugin class. The parameter is an envirement object containing all pimatic related functions
-# and classes. See the [startup.coffee](http://sweetpi.de/pimatic/docs/startup.html) for details.
 module.exports = (env) ->
 
-# ###require modules included in pimatic
-# To require modules that are included in pimatic use `env.require`. For available packages take
-# a look at the dependencies section in pimatics package.json
-
-# Require the  bluebird promise library
-  #Promise = env.require 'bluebird'
+  Promise = env.require 'bluebird'
 
   # Require the [cassert library](https://github.com/rhoot/cassert).
-  #assert = env.require 'cassert'
+  assert = env.require 'cassert'
 
-  # Include you own depencies with nodes global require function:
-  #  
+  crypto = env.require 'crypto'
+
   hap = require 'hap-nodejs'
   Bridge = hap.Bridge
   Accessory = hap.Accessory
@@ -29,23 +15,9 @@ module.exports = (env) ->
   Characteristic = hap.Characteristic
   uuid = require ('hap-nodejs/lib/util/uuid')
   once = require('hap-nodejs/lib/util/once').once;
-  #
 
-  # ###MyPlugin class
-  # Create a class that extends the Plugin class and implements the following functions:
   class HapPlugin extends env.plugins.Plugin
 
-
-    # ####init()
-    # The `init` function is called by the framework to ask your plugin to initialise.
-    #  
-    # #####params:
-    #  * `app` is the [express] instance the framework is using.
-    #  * `framework` the framework itself
-    #  * `config` the properties the user specified as config for your plugin in the `plugins` 
-    #     section of the config.json file 
-    #     
-    # 
     init: (app, @framework, @config) =>
       env.logger.info("Starting homekit bridge")
       hap.init()
@@ -55,8 +27,6 @@ module.exports = (env) ->
       @framework.once "after init", =>
         bridge.publish()
 
-  # ###Finally
-  # Create a instance of my plugin
   plugin = new HapPlugin()
 
   class HapBridge
@@ -71,8 +41,8 @@ module.exports = (env) ->
 
     addDevice: (device) =>
       env.logger.debug("try to add device " + device.name)
-      if device instanceof env.devices.SwitchActuator
-        new SwitchAccessory(device, this.bridge)
+      if device instanceof env.devices.PowerSwitch
+        new PowerSwitchAccessory(device, this.bridge)
         env.logger.debug("added device " + device.name)
 
 
@@ -80,28 +50,37 @@ module.exports = (env) ->
       env.logger.debug("publishing...")
       # TODO: Make settings configurable
       this.bridge.publish({
-        username: "CC:22:3D:E3:CE:F6",
+        username: this.generateUniqueUsername(this.bridge.displayName),
         port: 51826,
         pincode: "031-45-154",
         category: Accessory.Categories.OTHER
       })
 
+    generateUniqueUsername: (name) =>
+      shasum = crypto.createHash('sha1')
+      shasum.update(name)
+      hash = shasum.digest('hex')
 
-  class SwitchAccessory
+      return "" +
+          hash[0] + hash[1] + ':' +
+          hash[2] + hash[3] + ':' +
+          hash[4] + hash[5] + ':' +
+          hash[6] + hash[7] + ':' +
+          hash[8] + hash[9] + ':' +
+          hash[10] + hash[11]
 
-    device: null
+
+  class PowerSwitchAccessory
 
     constructor: (@device, @bridge) ->
-      uuid = uuid.generate('pimatic-hap:accessories:switch')
-      accessory = new Accessory(device.name, uuid)
-      accessory.username = "1A:2B:3C:4D:5E:FF"
-      accessory.pincode = "031-45-154"
+      uuid = uuid.generate('pimatic-hap:accessories:switch:' + @device.id)
+      accessory = new Accessory(@device.name, uuid)
 
       accessory
         .getService(Service.AccessoryInformation)
-        .setCharacteristic(Characteristic.Manufacturer, "Oltica")
+        .setCharacteristic(Characteristic.Manufacturer, "Pimatic")
         .setCharacteristic(Characteristic.Model, "Rev-1")
-        .setCharacteristic(Characteristic.SerialNumber, "A1S2NASF88EW");
+        .setCharacteristic(Characteristic.SerialNumber, uuid);
 
       accessory.on 'identify', (paired, callback) =>
         this.identify()
@@ -111,23 +90,21 @@ module.exports = (env) ->
         .addService(Service.Switch, device.name)
         .getCharacteristic(Characteristic.On)
         .on 'set', (value, callback) =>
-          env.logger.debug("switching on")
-          device.changeStateTo(value)
+          env.logger.debug("changing state to " + value)
+          @device.changeStateTo(value)
           callback()
 
       accessory
         .getService(Service.Switch)
         .getCharacteristic(Characteristic.On)
         .on 'get', (callback) =>
-          env.logger.debug("returning device state")
-          callback(null, device.state)
+          env.logger.debug("returning device state=" + @device.state)
+          callback(@device.state)
 
 
-      this.bridge.addBridgedAccessory(accessory)
+      @bridge.addBridgedAccessory(accessory)
 
     identify: =>
-      env.logger.debug("SwitchAccessory identify")
+      env.logger.debug("PowerSwitchAccessory identify")
 
-
-  # now return plugin to the framework.
   return plugin
