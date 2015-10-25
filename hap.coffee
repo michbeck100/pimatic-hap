@@ -23,14 +23,16 @@ module.exports = (env) ->
 
       @framework.on 'deviceAdded', (device) =>
         env.logger.debug("try to add device " + device.name)
+        accessory: null
         if device instanceof env.devices.DimmerActuator
-          env.logger.debug("adding dimmer " + device.name)
+          accessory = new DimmerAccessory(device)
         else if device instanceof env.devices.SwitchActuator
-          powerSwitch = new PowerSwitchAccessory(device)
-          bridge.addBridgedAccessory(powerSwitch)
+          accessory = new PowerSwitchAccessory(device)
         else
           env.logger.error("unsupported device type " + device.type)
-        env.logger.debug("added device " + device.name)
+        if accessory?
+          bridge.addBridgedAccessory(accessory)
+          env.logger.debug("added device " + device.name)
 
       @framework.once "after init", =>
         # publish homekit bridge
@@ -58,33 +60,68 @@ module.exports = (env) ->
   plugin = new HapPlugin()
 
   # base class for switch actuators
-  # class SwitchAccessory
+  class SwitchAccessory extends Accessory
 
-
-  class PowerSwitchAccessory extends Accessory
-
-    constructor: (@device) ->
-      uuid = uuid.generate('pimatic-hap:accessories:switch:' + @device.id)
-      super(@device.name, uuid)
+    constructor: (device) ->
+      serialNumber = uuid.generate('pimatic-hap:accessories:switch:' + device.id)
+      super(device.name, serialNumber)
 
       @getService(Service.AccessoryInformation)
         .setCharacteristic(Characteristic.Manufacturer, "Pimatic")
         .setCharacteristic(Characteristic.Model, "Rev-1")
-        .setCharacteristic(Characteristic.SerialNumber, uuid);
-
+        .setCharacteristic(Characteristic.SerialNumber, serialNumber);
       @on 'identify', (paired, callback) =>
-        env.logger.debug("PowerSwitchAccessory identify")
-        callback()
+        this.identify(paired, callback)
+
+    ## default identify method just logs and calls callback
+    identify: (paired, callback) =>
+      env.logger.debug("identify method called")
+      callback()
+
+  class PowerSwitchAccessory extends SwitchAccessory
+
+    constructor: (device) ->
+      super(device)
 
       @addService(Service.Switch, device.name)
         .getCharacteristic(Characteristic.On)
         .on 'set', (value, callback) =>
           env.logger.debug("changing state to " + value)
-          @device.changeStateTo(value).then( callback() )
+          device.changeStateTo(value).then( callback() )
 
       @getService(Service.Switch)
         .getCharacteristic(Characteristic.On)
         .on 'get', (callback) =>
-          @device.getState().then( (state) => callback(state) )
+          device.getState().then( (state) => callback(state) )
+
+  class DimmerAccessory extends SwitchAccessory
+
+    constructor: (device) ->
+      super(device)
+
+      @addService(Service.Lightbulb, device.name)
+        .getCharacteristic(Characteristic.On)
+        .on 'set', (value, callback) =>
+          env.logger.debug("changing state to " + value)
+          if value
+            device.turnOn().then( callback() )
+          else
+            device.turnOff().then( callback() )
+
+      @getService(Service.Lightbulb)
+        .getCharacteristic(Characteristic.On)
+        .on 'get', (callback) =>
+          device.getState().then( (state) => callback(state) )
+
+      @getService(Service.Lightbulb)
+        .getCharacteristic(Characteristic.Brightness)
+        .on 'get', (callback) =>
+          device.getDimlevel().then( (dimlevel) => callback(dimlevel) )
+
+      @getService(Service.Lightbulb)
+        .getCharacteristic(Characteristic.Brightness)
+        .on 'set', (value, callback) =>
+          env.logger.debug("changing dimLevel to " + value)
+          device.changeDimlevelTo(value).then( callback() )
 
   return plugin
