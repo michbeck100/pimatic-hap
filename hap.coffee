@@ -28,6 +28,8 @@ module.exports = (env) ->
           accessory = new DimmerAccessory(device)
         else if device instanceof env.devices.SwitchActuator
           accessory = new PowerSwitchAccessory(device)
+        else if device instanceof env.devices.ShutterController
+          accessory = new ShutterAccessory(device)
         else
           env.logger.debug("unsupported device type " + device.constructor.name)
         if accessory?
@@ -61,11 +63,11 @@ module.exports = (env) ->
 
   plugin = new HapPlugin()
 
-  # base class for switch actuators
-  class SwitchAccessory extends Accessory
+  # base class for all homekit accessories in pimatic
+  class DeviceAccessory extends Accessory
 
     constructor: (device) ->
-      serialNumber = uuid.generate('pimatic-hap:accessories:switch:' + device.id)
+      serialNumber = uuid.generate('pimatic-hap:accessories:' + device.id)
       super(device.name, serialNumber)
 
       @getService(Service.AccessoryInformation)
@@ -73,12 +75,38 @@ module.exports = (env) ->
         .setCharacteristic(Characteristic.Model, "Rev-1")
         .setCharacteristic(Characteristic.SerialNumber, serialNumber);
       @on 'identify', (paired, callback) =>
-        this.identify(paired, callback)
+        this.identify(device, paired, callback)
 
     ## default identify method just logs and calls callback
-    identify: (paired, callback) =>
-      env.logger.debug("identify method called")
+    identify: (device, paired, callback) =>
+      env.logger.debug("identify " + device.name)
       callback()
+
+  # base class for switch actuators
+  class SwitchAccessory extends DeviceAccessory
+
+    constructor: (device) ->
+      super(device)
+
+    # default identify method on switches turns the switch on and off two times
+    identify: (device, paired, callback) =>
+      env.logger.debug("blinking " + device.name + " twice for identification")
+      # make sure it's off, then turn on and off twice
+      device.getState().then( (state) =>
+        device.turnOff().then(
+          device.turnOn().then(
+            device.turnOff().then(
+              device.turnOn().then(
+                # recover initial state
+                if !state
+                  device.turnOff().then(callback())
+                else
+                  callback()
+              )
+            )
+          )
+        )
+      )
 
   class PowerSwitchAccessory extends SwitchAccessory
 
@@ -88,7 +116,7 @@ module.exports = (env) ->
       @addService(Service.Switch, device.name)
         .getCharacteristic(Characteristic.On)
         .on 'set', (value, callback) =>
-          env.logger.debug("changing state of " + this.displayName + " to " + value)
+          # env.logger.debug("changing state of " + this.displayName + " to " + value)
           device.changeStateTo(value).then( callback() )
 
       @getService(Service.Switch)
@@ -104,7 +132,7 @@ module.exports = (env) ->
       @addService(Service.Lightbulb, device.name)
         .getCharacteristic(Characteristic.On)
         .on 'set', (value, callback) =>
-          env.logger.debug("changing state to " + value)
+          # env.logger.debug("changing state to " + value)
           if value
             device.turnOn().then( callback() )
           else
@@ -123,7 +151,52 @@ module.exports = (env) ->
       @getService(Service.Lightbulb)
         .getCharacteristic(Characteristic.Brightness)
         .on 'set', (value, callback) =>
-          env.logger.debug("changing dimLevel to " + value)
+          # env.logger.debug("changing dimLevel to " + value)
           device.changeDimlevelTo(value).then( callback() )
+
+  # currently shutter is using Service.LockMechanism because Service.Window uses percentages
+  # for moving the shutter which is not supported by ShutterController devices
+  class ShutterAccessory extends DeviceAccessory
+
+    constructor: (device) ->
+      super(device)
+
+      @addService(Service.LockMechanism, device.name)
+        .getCharacteristic(Characteristic.LockTargetState)
+        .on 'set', (value, callback) =>
+          if value == Characteristic.LockTargetState.UNSECURED
+            env.logger.debug("moving shutter up")
+            device.moveUp().then( callback() )
+          else if value == Characteristic.LockTargetState.SECURED
+            env.logger.debug("moving shutter down")
+            device.moveDown().then( callback() )
+
+      @getService(Service.LockMechanism)
+        .getCharacteristic(Characteristic.LockTargetState)
+        .on 'get', (callback) =>
+          device.getPosition().then( (position) =>
+            if position == 'up'
+              callback(Characteristic.LockCurrentState.SECURED)
+            else if position == "down"
+              callback(Characteristic.LockCurrentState.UNSECURED)
+            else
+              # stopped somewhere in between
+              callback(Characteristic.LockCurrentState.UNKNOWN)
+          )
+
+      # opposite of target position getter
+      @getService(Service.LockMechanism)
+        .getCharacteristic(Characteristic.LockCurrentState)
+        .on 'get', (callback) =>
+          device.getPosition().then( (position) =>
+            env.logger.debug("returning current position: " + position)
+            if position == 'up'
+              callback(Characteristic.LockCurrentState.UNSECURED)
+            else if position == "down"
+              callback(Characteristic.LockCurrentState.SECURED)
+            else
+              # stopped somewhere in between
+              callback(Characteristic.LockCurrentState.UNKNOWN)
+          )
 
   return plugin
