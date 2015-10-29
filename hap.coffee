@@ -19,28 +19,30 @@ module.exports = (env) ->
       env.logger.info("Starting homekit bridge")
       hap.init()
 
-      bridge = new Bridge('Pimatic HomeKit Bridge', uuid.generate("Pimatic HomeKit Bridge"))
+      bridge = new Bridge(@config.name, uuid.generate(@config.name))
 
       @framework.on 'deviceAdded', (device) =>
-        env.logger.debug("try to add device " + device.name)
+        env.logger.debug("trying to add device " + device.name)
         accessory: null
         if device instanceof env.devices.DimmerActuator
           accessory = new DimmerAccessory(device)
         else if device instanceof env.devices.SwitchActuator
           accessory = new PowerSwitchAccessory(device)
         else
-          env.logger.error("unsupported device type " + device.type)
+          env.logger.debug("unsupported device type " + device.constructor.name)
         if accessory?
           bridge.addBridgedAccessory(accessory)
-          env.logger.debug("added device " + device.name)
+          env.logger.debug("successfully added device " + device.name)
 
       @framework.once "after init", =>
         # publish homekit bridge
-        # TODO: Make settings configurable
+        env.logger.debug("publishing homekit bridge on port " + @config.port)
+        env.logger.debug("pincode is: " + @config.pincode)
+
         bridge.publish({
           username: this.generateUniqueUsername(bridge.displayName),
-          port: 51826,
-          pincode: "031-45-154",
+          port: @config.port,
+          pincode: @config.pincode,
           category: Accessory.Categories.OTHER
         })
 
@@ -86,7 +88,7 @@ module.exports = (env) ->
       @addService(Service.Switch, device.name)
         .getCharacteristic(Characteristic.On)
         .on 'set', (value, callback) =>
-          env.logger.debug("changing state to " + value)
+          env.logger.debug("changing state of " + this.displayName + " to " + value)
           device.changeStateTo(value).then( callback() )
 
       @getService(Service.Switch)
