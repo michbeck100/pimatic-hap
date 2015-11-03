@@ -1,4 +1,5 @@
-{ "name": "pimatic-hap",
+{
+  "name": "pimatic-hap",
   "description": "Pimatic plugin for creating Homekit Accessories from existing pimatic devices",
   "author": "Michael Kotten <michaelkotten@gmail.com> (https://github.com/michbeck100/pimatic-hap)",
   "main": "hap.coffee",
@@ -7,7 +8,7 @@
     "README.md",
     "hap-config-schema.coffee"
   ],
-  "version": "0.0.1",
+  "version": "0.0.2",
   "homepage": "https://github.com/michbeck100/pimatic-hap",
   "private": false,
   "repository": {
