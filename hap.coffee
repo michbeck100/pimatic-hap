@@ -21,6 +21,10 @@ module.exports = (env) ->
 
       bridge = new Bridge(@config.name, uuid.generate(@config.name))
 
+      bridge.on 'identify', (paired, callback) =>
+        env.logger.debug(@config.name + " identify")
+        callback()
+
       @framework.on 'deviceAdded', (device) =>
         env.logger.debug("trying to add device " + device.name)
         accessory: null
@@ -116,13 +120,13 @@ module.exports = (env) ->
       @addService(Service.Switch, device.name)
         .getCharacteristic(Characteristic.On)
         .on 'set', (value, callback) =>
-          # env.logger.debug("changing state of " + this.displayName + " to " + value)
+          env.logger.debug("changing state of " + this.displayName + " to " + value)
           device.changeStateTo(value).then( callback() )
 
       @getService(Service.Switch)
         .getCharacteristic(Characteristic.On)
         .on 'get', (callback) =>
-          device.getState().then( (state) => callback(state) )
+          device.getState().then( (state) => callback(null, state) )
 
   class DimmerAccessory extends SwitchAccessory
 
@@ -132,7 +136,7 @@ module.exports = (env) ->
       @addService(Service.Lightbulb, device.name)
         .getCharacteristic(Characteristic.On)
         .on 'set', (value, callback) =>
-          # env.logger.debug("changing state to " + value)
+          env.logger.debug("changing state to " + value)
           if value
             device.turnOn().then( callback() )
           else
@@ -141,17 +145,17 @@ module.exports = (env) ->
       @getService(Service.Lightbulb)
         .getCharacteristic(Characteristic.On)
         .on 'get', (callback) =>
-          device.getState().then( (state) => callback(state) )
+          device.getState().then( (state) => callback(null, state) )
 
       @getService(Service.Lightbulb)
         .getCharacteristic(Characteristic.Brightness)
         .on 'get', (callback) =>
-          device.getDimlevel().then( (dimlevel) => callback(dimlevel) )
+          device.getDimlevel().then( (dimlevel) => callback(null, dimlevel) )
 
       @getService(Service.Lightbulb)
         .getCharacteristic(Characteristic.Brightness)
         .on 'set', (value, callback) =>
-          # env.logger.debug("changing dimLevel to " + value)
+          env.logger.debug("changing dimLevel to " + value)
           device.changeDimlevelTo(value).then( callback() )
 
   # currently shutter is using Service.LockMechanism because Service.Window uses percentages
@@ -176,12 +180,12 @@ module.exports = (env) ->
         .on 'get', (callback) =>
           device.getPosition().then( (position) =>
             if position == 'up'
-              callback(Characteristic.LockCurrentState.SECURED)
+              callback(null, Characteristic.LockCurrentState.SECURED)
             else if position == "down"
-              callback(Characteristic.LockCurrentState.UNSECURED)
+              callback(null, Characteristic.LockCurrentState.UNSECURED)
             else
               # stopped somewhere in between
-              callback(Characteristic.LockCurrentState.UNKNOWN)
+              callback(null, Characteristic.LockCurrentState.UNKNOWN)
           )
 
       # opposite of target position getter
@@ -191,12 +195,12 @@ module.exports = (env) ->
           device.getPosition().then( (position) =>
             env.logger.debug("returning current position: " + position)
             if position == 'up'
-              callback(Characteristic.LockCurrentState.UNSECURED)
+              callback(null, Characteristic.LockCurrentState.UNSECURED)
             else if position == "down"
-              callback(Characteristic.LockCurrentState.SECURED)
+              callback(null, Characteristic.LockCurrentState.SECURED)
             else
               # stopped somewhere in between
-              callback(Characteristic.LockCurrentState.UNKNOWN)
+              callback(null, Characteristic.LockCurrentState.UNKNOWN)
           )
 
   return plugin
