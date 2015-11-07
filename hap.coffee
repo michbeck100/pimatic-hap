@@ -1,5 +1,5 @@
 
-module.exports = (env) ->
+module.exports = (env) =>
 
   # Require the [cassert library](https://github.com/rhoot/cassert).
   assert = env.require 'cassert'
@@ -72,7 +72,7 @@ module.exports = (env) ->
   # base class for all homekit accessories in pimatic
   class DeviceAccessory extends Accessory
 
-    constructor: (device) ->
+    constructor: (device) =>
       serialNumber = uuid.generate('pimatic-hap:accessories:' + device.id)
       super(device.name, serialNumber)
 
@@ -91,7 +91,7 @@ module.exports = (env) ->
   # base class for switch actuators
   class SwitchAccessory extends DeviceAccessory
 
-    constructor: (device) ->
+    constructor: (device) =>
       super(device)
 
     # default identify method on switches turns the switch on and off two times
@@ -119,7 +119,7 @@ module.exports = (env) ->
   ##
   class PowerSwitchAccessory extends SwitchAccessory
 
-    constructor: (device) ->
+    constructor: (device) =>
       super(device)
 
       @addService(Service.Switch, device.name)
@@ -138,7 +138,7 @@ module.exports = (env) ->
   ##
   class DimmerAccessory extends SwitchAccessory
 
-    constructor: (device) ->
+    constructor: (device) =>
       super(device)
 
       @addService(Service.Lightbulb, device.name)
@@ -173,7 +173,7 @@ module.exports = (env) ->
   # for moving the shutter which is not supported by ShutterController devices
   class ShutterAccessory extends DeviceAccessory
 
-    constructor: (device) ->
+    constructor: (device) =>
       super(device)
 
       @addService(Service.LockMechanism, device.name)
@@ -219,13 +219,36 @@ module.exports = (env) ->
   ##
   class TemperatureAccessory extends DeviceAccessory
 
-    constructor: (device) ->
+    constructor: (device) =>
       super(device)
 
       @addService(Service.TemperatureSensor, device.name)
         .getCharacteristic(Characteristic.CurrentTemperature)
         .on 'get', (callback) =>
-          callback(null, device.temperature)
+          device.getTemperature().then( (temp) =>
+            env.logger.debug("returning current temperature: " + temp)
+            callback(null, temp)
+          )
 
+  ##
+  # ContactSensor
+  ##
+  class ContactAccessory extends DeviceAccessory
+
+    constructor: (device) =>
+      super(device)
+
+      @addService(Service.ContactSensor, device.name)
+        .getCharacteristic(Characteristic.ContactSensorState)
+        .on 'get', (callback) =>
+          device.getContact().then( (state) =>
+            env.logger.debug("returning contact sensor state: " + state)
+            if state == 'closed'
+              callback(null, Characteristic.ContactSensorState.CONTACT_DETECTED)
+            else
+              callback(null, Characteristic.ContactSensorState.CONTACT_NOT_DETECTED)
+          )
+
+  class
 
   return plugin
