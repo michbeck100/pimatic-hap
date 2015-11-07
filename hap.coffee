@@ -269,6 +269,9 @@ module.exports = (env) =>
       else
         return Characteristic.ContactSensorState.CONTACT_NOT_DETECTED
 
+  ##
+  # HeatingThermostat
+  ##
   class ThermostatAccessory extends DeviceAccessory
 
     _temperature: 0
