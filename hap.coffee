@@ -36,6 +36,10 @@ module.exports = (env) =>
           accessory = new ShutterAccessory(device)
         else if device instanceof env.devices.TemperatureSensor
           accessory = new TemperatureAccessory(device)
+        else if device instanceof env.devices.ContactSensor
+          accessory = new ContactAccessory(device)
+        else if device instanceof env.device.HeatingThermostat
+          accessory = new ThermostatAccessory(device)
         else
           env.logger.debug("unsupported device type " + device.constructor.name)
         if accessory?
@@ -264,5 +268,78 @@ module.exports = (env) =>
         return Characteristic.ContactSensorState.CONTACT_DETECTED
       else
         return Characteristic.ContactSensorState.CONTACT_NOT_DETECTED
+
+  class ThermostatAccessory extends DeviceAccessory
+
+    _temperature: 0
+
+    constructor: (device) =>
+      super(device)
+
+      @addService(Service.Thermostat, device.name)
+        .getCharacteristic(Characteristic.TemperatureDisplayUnits)
+        .on 'get', (callback) =>
+          callback(null, Characteristic.TemperatureDisplayUnits.CELSIUS)
+
+      @getService(Service.Thermostat)
+        .getCharacteristic(Characteristic.CurrentTemperature)
+        .on 'get', (callback) =>
+          callback(null, @_temperature)
+
+      # some devices report the current temperature
+      device.on 'temperature', (temp) =>
+        @_temperature = temp
+        env.logger.debug("current temperature changed. Notifying iOS devices.")
+        @getService(Service.Thermostat)
+          .setCharacteristic(Characteristic.CurrentTemperature, temp)
+
+      @getService(Service.Thermostat)
+        .getCharacteristic(Characteristic.TargetTemperature)
+        .on 'get', (callback) =>
+          device.getTemperatureSetpoint().then( (target) =>
+            env.logger.debug("returning target temperature: " + target)
+            callback(null, target)
+          )
+
+      @getService(Service.Thermostat)
+        .getCharacteristic(Characteristic.TargetTemperature)
+        .on 'set', (value, callback) =>
+          env.logger.debug("setting target temperature to " + target)
+          device.changeTemperatureTo(value)
+          callback()
+
+      device.on 'temperatureSetpoint', (target) =>
+        env.logger.debug("target temperature changed. Notifying iOS devices.")
+        @getService(Service.Thermostat)
+          .setCharacteristic(Characteristic.TargetTemperature, target)
+
+      @getService(Service.Thermostat)
+        .getCharacteristic(Characteristic.CurrentHeatingCoolingState)
+        .on 'get', (callback) =>
+          # don't know what cooling states are supposed to be,
+          # for now always return Characteristic.CurrentHeatingCoolingState.HEAT
+          callback(null, Characteristic.CurrentHeatingCoolingState.HEAT)
+
+      @getService(Service.Thermostat)
+        .getCharacteristic(Characteristic.TargetHeatingCoolingState)
+        .on 'get', (callback) =>
+          # don't know what cooling states are supposed to be,
+          # for now always return Characteristic.TargetHeatingCoolingState.AUTO
+          callback(null, Characteristic.TargetHeatingCoolingState.AUTO)
+
+      @getService(Service.Thermostat)
+        .getCharacteristic(Characteristic.TargetHeatingCoolingState)
+        .on 'set', (value, callback) =>
+          # just mode auto is known
+          # the other modes don't match
+          if value == Characteristic.TargetHeatingCoolingState.AUTO
+            device.changeModeTo("auto")
+
+      device.on 'mode', (mode) =>
+        if mode == "auto"
+          env.logger.debug("current thermostat mode changed. Notifying iOS devices.")
+          @getService(Service.Thermostat)
+            .setCharacteristic(Characteristic.TargetHeatingCoolingState, Characteristic.TargetHeatingCoolingState.AUTO)
+
 
   return plugin
