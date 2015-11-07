@@ -112,6 +112,9 @@ module.exports = (env) ->
         )
       )
 
+  ##
+  # PowerSwitch
+  ##
   class PowerSwitchAccessory extends SwitchAccessory
 
     constructor: (device) ->
@@ -128,6 +131,9 @@ module.exports = (env) ->
         .on 'get', (callback) =>
           device.getState().then( (state) => callback(null, state) )
 
+  ##
+  # DimmerActuator
+  ##
   class DimmerAccessory extends SwitchAccessory
 
     constructor: (device) ->
@@ -158,6 +164,9 @@ module.exports = (env) ->
           env.logger.debug("changing dimLevel to " + value)
           device.changeDimlevelTo(value).then( callback() )
 
+  ##
+  # ShutterController
+  #
   # currently shutter is using Service.LockMechanism because Service.Window uses percentages
   # for moving the shutter which is not supported by ShutterController devices
   class ShutterAccessory extends DeviceAccessory
@@ -202,5 +211,19 @@ module.exports = (env) ->
               # stopped somewhere in between
               callback(null, Characteristic.LockCurrentState.UNKNOWN)
           )
+
+  ##
+  # TemperatureSensor
+  ##
+  class TemperatureAccessory extends DeviceAccessory
+
+    constructor: (device) ->
+      super(device)
+
+      @addService(Service.TemperatureSensor, device.name)
+        .getCharacteristic(Characteristic.CurrentTemperature)
+        .on 'get', (callback) =>
+          callback(null, device.temperature)
+
 
   return plugin
