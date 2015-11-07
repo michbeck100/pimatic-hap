@@ -34,6 +34,8 @@ module.exports = (env) ->
           accessory = new PowerSwitchAccessory(device)
         else if device instanceof env.devices.ShutterController
           accessory = new ShutterAccessory(device)
+        else if device instanceof env.devices.TemperatureSensor
+          accessory = new TemperatureAccessory(device)
         else
           env.logger.debug("unsupported device type " + device.constructor.name)
         if accessory?
