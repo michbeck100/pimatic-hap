@@ -38,7 +38,7 @@ module.exports = (env) =>
           accessory = new TemperatureAccessory(device)
         else if device instanceof env.devices.ContactSensor
           accessory = new ContactAccessory(device)
-        else if device instanceof env.device.HeatingThermostat
+        else if device instanceof env.devices.HeatingThermostat
           accessory = new ThermostatAccessory(device)
         else
           env.logger.debug("unsupported device type " + device.constructor.name)
@@ -76,7 +76,7 @@ module.exports = (env) =>
   # base class for all homekit accessories in pimatic
   class DeviceAccessory extends Accessory
 
-    constructor: (device) =>
+    constructor: (device) ->
       serialNumber = uuid.generate('pimatic-hap:accessories:' + device.id)
       super(device.name, serialNumber)
 
@@ -95,7 +95,7 @@ module.exports = (env) =>
   # base class for switch actuators
   class SwitchAccessory extends DeviceAccessory
 
-    constructor: (device) =>
+    constructor: (device) ->
       super(device)
 
     # default identify method on switches turns the switch on and off two times
@@ -123,7 +123,7 @@ module.exports = (env) =>
   ##
   class PowerSwitchAccessory extends SwitchAccessory
 
-    constructor: (device) =>
+    constructor: (device) ->
       super(device)
 
       @addService(Service.Switch, device.name)
@@ -142,7 +142,7 @@ module.exports = (env) =>
   ##
   class DimmerAccessory extends SwitchAccessory
 
-    constructor: (device) =>
+    constructor: (device) ->
       super(device)
 
       @addService(Service.Lightbulb, device.name)
@@ -177,7 +177,7 @@ module.exports = (env) =>
   # for moving the shutter which is not supported by ShutterController devices
   class ShutterAccessory extends DeviceAccessory
 
-    constructor: (device) =>
+    constructor: (device) ->
       super(device)
 
       @addService(Service.LockMechanism, device.name)
@@ -231,7 +231,7 @@ module.exports = (env) =>
   ##
   class TemperatureAccessory extends DeviceAccessory
 
-    constructor: (device) =>
+    constructor: (device) ->
       super(device)
 
       @addService(Service.TemperatureSensor, device.name)
@@ -247,7 +247,7 @@ module.exports = (env) =>
   ##
   class ContactAccessory extends DeviceAccessory
 
-    constructor: (device) =>
+    constructor: (device) ->
       super(device)
 
       @addService(Service.ContactSensor, device.name)
@@ -273,7 +273,7 @@ module.exports = (env) =>
 
     _temperature: 0
 
-    constructor: (device) =>
+    constructor: (device) ->
       super(device)
 
       @addService(Service.Thermostat, device.name)
@@ -304,7 +304,7 @@ module.exports = (env) =>
       @getService(Service.Thermostat)
         .getCharacteristic(Characteristic.TargetTemperature)
         .on 'set', (value, callback) =>
-          env.logger.debug("setting target temperature to " + target)
+          env.logger.debug("setting target temperature to " + value)
           device.changeTemperatureTo(value)
           callback()
 
@@ -334,6 +334,7 @@ module.exports = (env) =>
           # the other modes don't match
           if value == Characteristic.TargetHeatingCoolingState.AUTO
             device.changeModeTo("auto")
+          callback()
 
       device.on 'mode', (mode) =>
         if mode == "auto"
