@@ -205,14 +205,22 @@ module.exports = (env) =>
         .on 'get', (callback) =>
           device.getPosition().then( (position) =>
             env.logger.debug("returning current position: " + position)
+            callback(null, this.getLockCurrentState(position))
+          )
+
+      device.on 'position', (position) =>
+        env.logger.debug("position of shutter changed. Notifying iOS devices.")
+        @getService(Service.LockMechanism)
+          .setCharacteristic(Characteristic.LockCurrentState, this.getLockCurrentState(position))
+
+    getLockCurrentState: (position) =>
             if position == 'up'
-              callback(null, Characteristic.LockCurrentState.UNSECURED)
+              return Characteristic.LockCurrentState.UNSECURED
             else if position == "down"
-              callback(null, Characteristic.LockCurrentState.SECURED)
+              return Characteristic.LockCurrentState.SECURED
             else
               # stopped somewhere in between
-              callback(null, Characteristic.LockCurrentState.UNKNOWN)
-          )
+              return Characteristic.LockCurrentState.UNKNOWN
 
   ##
   # TemperatureSensor
@@ -243,12 +251,18 @@ module.exports = (env) =>
         .on 'get', (callback) =>
           device.getContact().then( (state) =>
             env.logger.debug("returning contact sensor state: " + state)
-            if state == 'closed'
-              callback(null, Characteristic.ContactSensorState.CONTACT_DETECTED)
-            else
-              callback(null, Characteristic.ContactSensorState.CONTACT_NOT_DETECTED)
+            callback(null, this.getHomekitState(state))
           )
 
-  class
+      device.on 'contact', (state) =>
+        env.logger.debug("contact sensor state changed. Notifying iOS devices.")
+        @getService(Service.ContactSensor)
+          .setCharacteristic(Characteristic.ContactSensorState, getHomekitState(state))
+
+    getHomekitState: (state) =>
+      if state == 'closed'
+        return Characteristic.ContactSensorState.CONTACT_DETECTED
+      else
+        return Characteristic.ContactSensorState.CONTACT_NOT_DETECTED
 
   return plugin
