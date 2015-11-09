@@ -264,7 +264,7 @@ module.exports = (env) =>
           .setCharacteristic(Characteristic.ContactSensorState, this.getHomekitState(state))
 
     getHomekitState: (state) =>
-      if state == 'closed'
+      if state
         return Characteristic.ContactSensorState.CONTACT_DETECTED
       else
         return Characteristic.ContactSensorState.CONTACT_NOT_DETECTED
