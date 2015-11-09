@@ -261,7 +261,7 @@ module.exports = (env) =>
       device.on 'contact', (state) =>
         env.logger.debug("contact sensor state changed. Notifying iOS devices.")
         @getService(Service.ContactSensor)
-          .setCharacteristic(Characteristic.ContactSensorState, getHomekitState(state))
+          .setCharacteristic(Characteristic.ContactSensorState, this.getHomekitState(state))
 
     getHomekitState: (state) =>
       if state == 'closed'
