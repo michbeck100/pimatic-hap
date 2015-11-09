@@ -8,7 +8,7 @@
     "README.md",
     "hap-config-schema.coffee"
   ],
-  "version": "0.2.0",
+  "version": "0.2.1",
   "homepage": "https://github.com/michbeck100/pimatic-hap",
   "private": false,
   "repository": {
