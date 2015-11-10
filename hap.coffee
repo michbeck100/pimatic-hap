@@ -92,6 +92,25 @@ module.exports = (env) =>
       env.logger.debug("identify " + device.name)
       callback()
 
+    ## calls promise, then callback, and handles errors
+    handleVoidPromise: (promise, callback) =>
+      promise
+        .then( => callback() )
+        .catch( (error) => callback(error) )
+        .done()
+
+    handleReturnPromise: (promise, callback, converter) =>
+      promise
+        .then( (value) =>
+          env.logger.debug("returning value " + value)
+          if converter != null
+            value = converter(value)
+            env.logger.debug("value converted to " + value)
+          callback(null, value)
+        )
+        .catch( (error) => callback(error, null) )
+        .done()
+
   # base class for switch actuators
   class SwitchAccessory extends DeviceAccessory
 
@@ -102,21 +121,15 @@ module.exports = (env) =>
     identify: (device, paired, callback) =>
       env.logger.debug("blinking " + device.name + " twice for identification")
       # make sure it's off, then turn on and off twice
-      device.getState().then( (state) =>
-        device.turnOff().then(
-          device.turnOn().then(
-            device.turnOff().then(
-              device.turnOn().then(
-                # recover initial state
-                if !state
-                  device.turnOff().then(callback())
-                else
-                  callback()
-              )
-            )
-          )
-        )
-      )
+      promise = device.getState()
+        .then( (state) => device.turnOff() )
+        .then( => device.turnOn() )
+        .then( => device.turnOff() )
+        .then( => device.turnOn() )
+        .then( =>
+          # recover initial state
+          device.turnOff() if not state )
+      this.handleVoidPromise(promise, callback)
 
   ##
   # PowerSwitch
@@ -130,12 +143,18 @@ module.exports = (env) =>
         .getCharacteristic(Characteristic.On)
         .on 'set', (value, callback) =>
           env.logger.debug("changing state of " + this.displayName + " to " + value)
-          device.changeStateTo(value).then( callback() )
+          this.handleVoidPromise(device.changeStateTo(value), callback)
 
       @getService(Service.Switch)
         .getCharacteristic(Characteristic.On)
         .on 'get', (callback) =>
-          device.getState().then( (state) => callback(null, state) )
+          this.handleReturnPromise(device.getState(), callback)
+
+      device.on 'state', (state) =>
+        env.logger.debug("switch state changed. Notifying iOS devices.")
+        @getService(Service.Switch)
+          .setCharacteristic(Characteristic.On, state)
+
 
   ##
   # DimmerActuator
@@ -149,26 +168,33 @@ module.exports = (env) =>
         .getCharacteristic(Characteristic.On)
         .on 'set', (value, callback) =>
           env.logger.debug("changing state to " + value)
+          promise = null
           if value
-            device.turnOn().then( callback() )
+            promise = device.turnOn()
           else
-            device.turnOff().then( callback() )
+            promise = device.turnOff()
+          this.handleVoidPromise(promise, callback)
 
       @getService(Service.Lightbulb)
         .getCharacteristic(Characteristic.On)
         .on 'get', (callback) =>
-          device.getState().then( (state) => callback(null, state) )
+          this.handleReturnPromise(device.getState(), callback, null)
 
       @getService(Service.Lightbulb)
         .getCharacteristic(Characteristic.Brightness)
         .on 'get', (callback) =>
-          device.getDimlevel().then( (dimlevel) => callback(null, dimlevel) )
+          this.handleReturnPromise(device.getDimlevel(), callback)
+
+      device.on 'dimlevel', (dimlevel) =>
+        env.logger.debug("dimlevel changed. Notifying iOS devices.")
+        @getService(Service.Lightbulb)
+          .setCharacteristic(Characteristic.Brightness, dimlevel)
 
       @getService(Service.Lightbulb)
         .getCharacteristic(Characteristic.Brightness)
         .on 'set', (value, callback) =>
           env.logger.debug("changing dimLevel to " + value)
-          device.changeDimlevelTo(value).then( callback() )
+          this.handleVoidPromise(device.changeDimlevelTo(value), callback)
 
   ##
   # ShutterController
@@ -183,34 +209,26 @@ module.exports = (env) =>
       @addService(Service.LockMechanism, device.name)
         .getCharacteristic(Characteristic.LockTargetState)
         .on 'set', (value, callback) =>
+          promise = null
           if value == Characteristic.LockTargetState.UNSECURED
             env.logger.debug("moving shutter up")
-            device.moveUp().then( callback() )
+            promise = device.moveUp()
           else if value == Characteristic.LockTargetState.SECURED
             env.logger.debug("moving shutter down")
-            device.moveDown().then( callback() )
+            promise = device.moveDown()
+          if (promise != null)
+            this.handleVoidPromise(promise, callback)
 
       @getService(Service.LockMechanism)
         .getCharacteristic(Characteristic.LockTargetState)
         .on 'get', (callback) =>
-          device.getPosition().then( (position) =>
-            if position == 'up'
-              callback(null, Characteristic.LockCurrentState.SECURED)
-            else if position == "down"
-              callback(null, Characteristic.LockCurrentState.UNSECURED)
-            else
-              # stopped somewhere in between
-              callback(null, Characteristic.LockCurrentState.UNKNOWN)
-          )
+          this.handleReturnPromise(device.getPosition(), callback, this.getLockCurrentState)
 
       # opposite of target position getter
       @getService(Service.LockMechanism)
         .getCharacteristic(Characteristic.LockCurrentState)
         .on 'get', (callback) =>
-          device.getPosition().then( (position) =>
-            env.logger.debug("returning current position: " + position)
-            callback(null, this.getLockCurrentState(position))
-          )
+          this.handleReturnPromise(device.getPosition(), callback, this.getLockCurrentState)
 
       device.on 'position', (position) =>
         env.logger.debug("position of shutter changed. Notifying iOS devices.")
@@ -237,10 +255,7 @@ module.exports = (env) =>
       @addService(Service.TemperatureSensor, device.name)
         .getCharacteristic(Characteristic.CurrentTemperature)
         .on 'get', (callback) =>
-          device.getTemperature().then( (temp) =>
-            env.logger.debug("returning current temperature: " + temp)
-            callback(null, temp)
-          )
+          this.handleReturnPromise(device.getTemperature(), callback, null)
 
   ##
   # ContactSensor
@@ -253,17 +268,14 @@ module.exports = (env) =>
       @addService(Service.ContactSensor, device.name)
         .getCharacteristic(Characteristic.ContactSensorState)
         .on 'get', (callback) =>
-          device.getContact().then( (state) =>
-            env.logger.debug("returning contact sensor state: " + state)
-            callback(null, this.getHomekitState(state))
-          )
+          this.handleReturnPromise(device.getContact(), callback, this.getContactSensorState)
 
       device.on 'contact', (state) =>
         env.logger.debug("contact sensor state changed. Notifying iOS devices.")
         @getService(Service.ContactSensor)
-          .setCharacteristic(Characteristic.ContactSensorState, this.getHomekitState(state))
+          .setCharacteristic(Characteristic.ContactSensorState, this.getContactSensorState(state))
 
-    getHomekitState: (state) =>
+    getContactSensorState: (state) =>
       if state
         return Characteristic.ContactSensorState.CONTACT_DETECTED
       else
@@ -299,10 +311,7 @@ module.exports = (env) =>
       @getService(Service.Thermostat)
         .getCharacteristic(Characteristic.TargetTemperature)
         .on 'get', (callback) =>
-          device.getTemperatureSetpoint().then( (target) =>
-            env.logger.debug("returning target temperature: " + target)
-            callback(null, target)
-          )
+          this.handleReturnPromise(device.getTemperatureSetpoint(), callback, null)
 
       @getService(Service.Thermostat)
         .getCharacteristic(Characteristic.TargetTemperature)
