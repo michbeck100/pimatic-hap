@@ -38,3 +38,6 @@ Changelog:
 0.0.1
 * initial release
 * support for switches and dimmers
+
+### Credit
+The original HomeKit API work was done by [KhaosT](http://twitter.com/khaost) in his [HAP-NodeJS](https://github.com/KhaosT/HAP-NodeJS) project.
