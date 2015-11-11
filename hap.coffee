@@ -122,13 +122,16 @@ module.exports = (env) =>
       env.logger.debug("blinking " + device.name + " twice for identification")
       # make sure it's off, then turn on and off twice
       promise = device.getState()
-        .then( (state) => device.turnOff() )
-        .then( => device.turnOn() )
-        .then( => device.turnOff() )
-        .then( => device.turnOn() )
-        .then( =>
-          # recover initial state
-          device.turnOff() if not state )
+        .then( (state) => 
+          device.turnOff()
+          .then( => device.turnOn() )
+          .then( => device.turnOff() )
+          .then( => device.turnOn() )
+          .then( =>
+            # recover initial state
+            device.turnOff() if not state
+          )
+        )
       this.handleVoidPromise(promise, callback)
 
   ##
