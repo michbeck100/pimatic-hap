@@ -24,6 +24,11 @@ Every iOS app that works with homekit should work with this (like Elgato Eve), s
 
 Changelog:
 
+0.3.0
+* [#4](https://github.com/michbeck100/pimatic-hap/issues/4) refactored use of promises
+* Fix for restore state at device identify
+* updated hap-nodejs dependency to 0.0.6
+
 0.2.2
 * contact sensor handling fixed
 
