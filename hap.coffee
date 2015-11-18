@@ -103,7 +103,7 @@ module.exports = (env) =>
       promise
         .then( (value) =>
           env.logger.debug("returning value " + value)
-          if converter != null
+          if converter
             value = converter(value)
             env.logger.debug("value converted to " + value)
           callback(null, value)
@@ -122,7 +122,7 @@ module.exports = (env) =>
       env.logger.debug("blinking " + device.name + " twice for identification")
       # make sure it's off, then turn on and off twice
       promise = device.getState()
-        .then( (state) => 
+        .then( (state) =>
           device.turnOff()
           .then( => device.turnOn() )
           .then( => device.turnOff() )
@@ -145,6 +145,9 @@ module.exports = (env) =>
       @addService(Service.Switch, device.name)
         .getCharacteristic(Characteristic.On)
         .on 'set', (value, callback) =>
+          if device._state == value
+            callback()
+            return
           env.logger.debug("changing state of " + this.displayName + " to " + value)
           this.handleVoidPromise(device.changeStateTo(value), callback)
 
@@ -170,6 +173,9 @@ module.exports = (env) =>
       @addService(Service.Lightbulb, device.name)
         .getCharacteristic(Characteristic.On)
         .on 'set', (value, callback) =>
+          if device._state == value
+            callback()
+            return
           env.logger.debug("changing state to " + value)
           promise = null
           if value
@@ -196,6 +202,9 @@ module.exports = (env) =>
       @getService(Service.Lightbulb)
         .getCharacteristic(Characteristic.Brightness)
         .on 'set', (value, callback) =>
+          if device._dimlevel == value
+            callback()
+            return
           env.logger.debug("changing dimLevel to " + value)
           this.handleVoidPromise(device.changeDimlevelTo(value), callback)
 
