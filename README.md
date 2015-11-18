@@ -24,6 +24,12 @@ Every iOS app that works with homekit should work with this (like Elgato Eve), s
 
 Changelog:
 
+0.2.2
+* contact sensor handling fixed
+
+0.2.1
+* #3 - fixed error with contact sensor accessory
+
 0.2.0
 * support for TemperatureSensor, ContactSensor, HeatingThermostat
 * added change notification of iOS devices where possible
