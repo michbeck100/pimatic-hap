@@ -17,7 +17,7 @@
   },
   "configSchema": "hap-config-schema.coffee",
   "dependencies": {
-    "hap-nodejs": "0.0.6"
+    "hap-nodejs": "0.0.7"
   },
   "peerDependencies": {
     "pimatic": "0.8.*"
