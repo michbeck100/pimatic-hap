@@ -103,7 +103,7 @@ module.exports = (env) =>
       promise
         .then( (value) =>
           env.logger.debug("returning value " + value)
-          if converter
+          if converter == null
             value = converter(value)
             env.logger.debug("value converted to " + value)
           callback(null, value)
@@ -154,7 +154,7 @@ module.exports = (env) =>
       @getService(Service.Switch)
         .getCharacteristic(Characteristic.On)
         .on 'get', (callback) =>
-          this.handleReturnPromise(device.getState(), callback)
+          this.handleReturnPromise(device.getState(), callback, null)
 
       device.on 'state', (state) =>
         env.logger.debug("switch state changed. Notifying iOS devices.")
@@ -192,7 +192,7 @@ module.exports = (env) =>
       @getService(Service.Lightbulb)
         .getCharacteristic(Characteristic.Brightness)
         .on 'get', (callback) =>
-          this.handleReturnPromise(device.getDimlevel(), callback)
+          this.handleReturnPromise(device.getDimlevel(), callback, null)
 
       device.on 'dimlevel', (dimlevel) =>
         env.logger.debug("dimlevel changed. Notifying iOS devices.")
