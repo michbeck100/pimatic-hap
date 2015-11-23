@@ -335,6 +335,8 @@ module.exports = (env) =>
         .getCharacteristic(Characteristic.TargetTemperature)
         .on 'set', (value, callback) =>
           env.logger.debug("setting target temperature to " + value)
+          # this may be the only chance to get a nearly accurate temperature
+          @_temperature = value
           device.changeTemperatureTo(value)
           callback()
 
