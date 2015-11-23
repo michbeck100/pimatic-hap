@@ -304,7 +304,7 @@ module.exports = (env) =>
   ##
   class ThermostatAccessory extends DeviceAccessory
 
-    _temperature: 0
+    _temperature: -273
 
     constructor: (device) ->
       super(device)
@@ -317,14 +317,17 @@ module.exports = (env) =>
       @getService(Service.Thermostat)
         .getCharacteristic(Characteristic.CurrentTemperature)
         .on 'get', (callback) =>
-          callback(null, @_temperature)
+          if @_temperature == -273
+            device.getTemperatureSetpoint().then( (temp) =>
+                @_temperature = temp
+                callback(null, @_temperature)
+              )
+          else
+            callback(null, @_temperature)
 
       # some devices report the current temperature
       device.on 'temperature', (temp) =>
-        @_temperature = temp
-        env.logger.debug("current temperature changed. Notifying iOS devices.")
-        @getService(Service.Thermostat)
-          .setCharacteristic(Characteristic.CurrentTemperature, temp)
+        this.setTemperatureTo(temp)
 
       @getService(Service.Thermostat)
         .getCharacteristic(Characteristic.TargetTemperature)
@@ -335,9 +338,9 @@ module.exports = (env) =>
         .getCharacteristic(Characteristic.TargetTemperature)
         .on 'set', (value, callback) =>
           env.logger.debug("setting target temperature to " + value)
-          # this may be the only chance to get a nearly accurate temperature
-          @_temperature = value
           device.changeTemperatureTo(value)
+          # this may be the only chance to get a nearly accurate temperature
+          this.setTemperatureTo(value)
           callback()
 
       device.on 'temperatureSetpoint', (target) =>
@@ -374,5 +377,11 @@ module.exports = (env) =>
           @getService(Service.Thermostat)
             .setCharacteristic(Characteristic.TargetHeatingCoolingState, Characteristic.TargetHeatingCoolingState.AUTO)
 
+    setTemperatureTo: (temp) =>
+      if @_temperature is temp then return
+      @_temperature = temp
+      env.logger.debug("current temperature changed. Notifying iOS devices.")
+      @getService(Service.Thermostat)
+        .setCharacteristic(Characteristic.CurrentTemperature, temp)
 
   return plugin
