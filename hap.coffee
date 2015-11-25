@@ -103,7 +103,7 @@ module.exports = (env) =>
       promise
         .then( (value) =>
           env.logger.debug("returning value " + value)
-          if converter == null
+          if converter != null
             value = converter(value)
             env.logger.debug("value converted to " + value)
           callback(null, value)
