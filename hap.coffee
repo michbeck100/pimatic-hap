@@ -257,19 +257,6 @@ module.exports = (env) =>
               return Characteristic.LockCurrentState.UNKNOWN
 
   ##
-  # TemperatureSensor
-  ##
-  class TemperatureAccessory extends DeviceAccessory
-
-    constructor: (device) ->
-      super(device)
-
-      @addService(Service.TemperatureSensor, device.name)
-        .getCharacteristic(Characteristic.CurrentTemperature)
-        .on 'get', (callback) =>
-          this.handleReturnPromise(device.getTemperature(), callback, null)
-
-  ##
   # ContactSensor
   ##
   class ContactAccessory extends DeviceAccessory
@@ -292,6 +279,24 @@ module.exports = (env) =>
         return Characteristic.ContactSensorState.CONTACT_DETECTED
       else
         return Characteristic.ContactSensorState.CONTACT_NOT_DETECTED
+
+  ##
+  # TemperatureSensor
+  ##
+  class TemperatureAccessory extends DeviceAccessory
+
+    constructor: (device) ->
+      super(device)
+
+      @addService(Service.TemperatureSensor, device.name)
+        .getCharacteristic(Characteristic.CurrentTemperature)
+        .on 'get', (callback) =>
+          this.handleReturnPromise(device.getTemperature(), callback, null)
+
+      device.on 'temperature', (temperature) =>
+        env.logger.debug("temperature of sensor changed. Notifying iOS devices.")
+        @getService(Service.TemperatureSensor)
+          .setCharacteristic(Characteristic.CurrentTemperature, temperature)
 
   ##
   # HeatingThermostat
