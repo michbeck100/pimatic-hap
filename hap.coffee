@@ -3,8 +3,8 @@ module.exports = (env) =>
 
   # Require the [cassert library](https://github.com/rhoot/cassert).
   assert = env.require 'cassert'
-
   crypto = env.require 'crypto'
+  path = require 'path'
 
   hap = require 'hap-nodejs'
   Bridge = hap.Bridge
@@ -17,7 +17,8 @@ module.exports = (env) =>
 
     init: (app, @framework, @config) =>
       env.logger.info("Starting homekit bridge")
-      hap.init()
+
+      hap.init(path.resolve @framework.maindir, '../../hap-database')
 
       bridge = new Bridge(@config.name, uuid.generate(@config.name))
 
