@@ -40,6 +40,8 @@ module.exports = (env) =>
           accessory = new ContactAccessory(device)
         else if device instanceof env.devices.HeatingThermostat
           accessory = new ThermostatAccessory(device)
+        else if device instanceof env.devices.BaseLedLight
+          accessory = new LedLightAccessory(device)
         else
           env.logger.debug("unsupported device type " + device.constructor.name)
         if accessory?
@@ -366,5 +368,29 @@ module.exports = (env) =>
           @getService(Service.Thermostat)
             .setCharacteristic(Characteristic.TargetHeatingCoolingState, Characteristic.TargetHeatingCoolingState.AUTO)
 
+  class LedLightAccessory extends DeviceAccessory
+
+    constructor: (device) ->
+      super(device)
+
+      @addService(Service.Lightbulb, device.name)
+        .getCharacteristic(Characteristic.On)
+        .on 'set', (value, callback) =>
+          
+          if device.getState().power is 'off'
+            callback()
+            return
+          env.logger.debug("changing state of " + this.displayName + " to " + value)
+          this.handleVoidPromise(device.changeStateTo(value), callback)
+
+      @getService(Service.Lightbulb)
+        .getCharacteristic(Characteristic.On)
+        .on 'get', (callback) =>
+          this.handleReturnPromise(device.getState(), callback, null)
+
+      device.on 'state', (state) =>
+        env.logger.debug("switch state changed. Notifying iOS devices.")
+        @getService(Service.Lightbulb)
+          .setCharacteristic(Characteristic.On, state)
 
   return plugin
