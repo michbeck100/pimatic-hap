@@ -6,6 +6,8 @@ module.exports = (env) =>
 
   crypto = env.require 'crypto'
 
+  Color = require 'color'
+
   hap = require 'hap-nodejs'
   Bridge = hap.Bridge
   Accessory = hap.Accessory
@@ -27,23 +29,8 @@ module.exports = (env) =>
 
       @framework.on 'deviceAdded', (device) =>
         env.logger.debug("trying to add device " + device.name)
-        accessory: null
-        if device instanceof env.devices.DimmerActuator
-          accessory = new DimmerAccessory(device)
-        else if device instanceof env.devices.SwitchActuator
-          accessory = new PowerSwitchAccessory(device)
-        else if device instanceof env.devices.ShutterController
-          accessory = new ShutterAccessory(device)
-        else if device instanceof env.devices.TemperatureSensor
-          accessory = new TemperatureAccessory(device)
-        else if device instanceof env.devices.ContactSensor
-          accessory = new ContactAccessory(device)
-        else if device instanceof env.devices.HeatingThermostat
-          accessory = new ThermostatAccessory(device)
-        else if device instanceof env.devices.BaseLedLight
-          accessory = new LedLightAccessory(device)
-        else
-          env.logger.debug("unsupported device type " + device.constructor.name)
+        accessory = this.createAccessoryFromTemplate(device)
+
         if accessory?
           bridge.addBridgedAccessory(accessory)
           env.logger.debug("successfully added device " + device.name)
@@ -72,6 +59,19 @@ module.exports = (env) =>
           hash[6] + hash[7] + ':' +
           hash[8] + hash[9] + ':' +
           hash[10] + hash[11]
+
+    createAccessoryFromTemplate: (device) =>
+      return switch device.template
+        when 'dimmer' then new DimmerAccessory(device)
+        when 'switch' then new SwitchAccessory(device)
+        when 'shutter' then new ShutterAccessory(device)
+        when 'temperature' then new TemperatureAccessory(device)
+        when 'contact' then new ContactAccessory(device)
+        when 'thermostat' then new ThermostatAccessory(device)
+        when 'led-light' then new LedLightAccessory(device)
+        else
+          env.logger.debug("unsupported device type: " + device.constructor.name)
+          null
 
   plugin = new HapPlugin()
 
@@ -376,21 +376,47 @@ module.exports = (env) =>
       @addService(Service.Lightbulb, device.name)
         .getCharacteristic(Characteristic.On)
         .on 'set', (value, callback) =>
-          
-          if device.getState().power is 'off'
+          if device.getState().power == value
             callback()
             return
           env.logger.debug("changing state of " + this.displayName + " to " + value)
-          this.handleVoidPromise(device.changeStateTo(value), callback)
+          if value
+            this.handleVoidPromise(device.turnOn(), callback)
+          else
+            this.handleVoidPromise(device.turnOff(), callback)
 
       @getService(Service.Lightbulb)
         .getCharacteristic(Characteristic.On)
         .on 'get', (callback) =>
-          this.handleReturnPromise(device.getState(), callback, null)
+          this.handleReturnPromise(device.getPower(), callback, null)
 
-      device.on 'state', (state) =>
-        env.logger.debug("switch state changed. Notifying iOS devices.")
+      device.on 'power', (state) =>
+        env.logger.debug("power state changed. Notifying iOS devices.")
         @getService(Service.Lightbulb)
-          .setCharacteristic(Characteristic.On, state)
+          .setCharacteristic(Characteristic.On, state == 'on')
+
+      @getService(Service.Lightbulb)
+        .getCharacteristic(Characteristic.Brightness)
+        .on 'get', (callback) =>
+          this.handleReturnPromise(device.getBrightness(), callback, null)
+
+      device.on 'brightness', (brightness) =>
+        env.logger.debug("brightness changed. Notifying iOS devices.")
+        @getService(Service.Lightbulb)
+          .setCharacteristic(Characteristic.Brightness, brightness)
+
+      @getService(Service.Lightbulb)
+        .getCharacteristic(Characteristic.Hue)
+        .on 'get', (callback) =>
+          this.handleReturnPromise(device.getColor(), callback, this.convertColor)
+
+      device.on 'color', (hexColor) =>
+        env.logger.debug("color changed. Notifying iOS devices.")
+        color = Color(hexColor)
+        @getService(Service.Lightbulb)
+          .setCharacteristic(Characteristic.Hue, this.convertColor(hexColor))
+
+      convertColor: (hexColor) =>
+        return Color(hexColor).hue
 
   return plugin
