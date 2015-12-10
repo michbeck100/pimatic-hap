@@ -3,8 +3,8 @@ module.exports = (env) =>
 
   # Require the [cassert library](https://github.com/rhoot/cassert).
   assert = env.require 'cassert'
-
   crypto = env.require 'crypto'
+  path = require 'path'
 
   Color = require 'color'
 
@@ -19,7 +19,8 @@ module.exports = (env) =>
 
     init: (app, @framework, @config) =>
       env.logger.info("Starting homekit bridge")
-      hap.init()
+
+      hap.init(path.resolve @framework.maindir, '../../hap-database')
 
       bridge = new Bridge(@config.name, uuid.generate(@config.name))
 
@@ -105,7 +106,7 @@ module.exports = (env) =>
       promise
         .then( (value) =>
           env.logger.debug("returning value " + value)
-          if converter == null
+          if converter != null
             value = converter(value)
             env.logger.debug("value converted to " + value)
           callback(null, value)
@@ -259,19 +260,6 @@ module.exports = (env) =>
               return Characteristic.LockCurrentState.UNKNOWN
 
   ##
-  # TemperatureSensor
-  ##
-  class TemperatureAccessory extends DeviceAccessory
-
-    constructor: (device) ->
-      super(device)
-
-      @addService(Service.TemperatureSensor, device.name)
-        .getCharacteristic(Characteristic.CurrentTemperature)
-        .on 'get', (callback) =>
-          this.handleReturnPromise(device.getTemperature(), callback, null)
-
-  ##
   # ContactSensor
   ##
   class ContactAccessory extends DeviceAccessory
@@ -296,11 +284,29 @@ module.exports = (env) =>
         return Characteristic.ContactSensorState.CONTACT_NOT_DETECTED
 
   ##
+  # TemperatureSensor
+  ##
+  class TemperatureAccessory extends DeviceAccessory
+
+    constructor: (device) ->
+      super(device)
+
+      @addService(Service.TemperatureSensor, device.name)
+        .getCharacteristic(Characteristic.CurrentTemperature)
+        .on 'get', (callback) =>
+          this.handleReturnPromise(device.getTemperature(), callback, null)
+
+      device.on 'temperature', (temperature) =>
+        env.logger.debug("temperature of sensor changed. Notifying iOS devices.")
+        @getService(Service.TemperatureSensor)
+          .setCharacteristic(Characteristic.CurrentTemperature, temperature)
+
+  ##
   # HeatingThermostat
   ##
   class ThermostatAccessory extends DeviceAccessory
 
-    _temperature: 0
+    _temperature: -273
 
     constructor: (device) ->
       super(device)
@@ -313,14 +319,17 @@ module.exports = (env) =>
       @getService(Service.Thermostat)
         .getCharacteristic(Characteristic.CurrentTemperature)
         .on 'get', (callback) =>
-          callback(null, @_temperature)
+          if @_temperature == -273
+            device.getTemperatureSetpoint().then( (temp) =>
+                @_temperature = temp
+                callback(null, @_temperature)
+              )
+          else
+            callback(null, @_temperature)
 
       # some devices report the current temperature
       device.on 'temperature', (temp) =>
-        @_temperature = temp
-        env.logger.debug("current temperature changed. Notifying iOS devices.")
-        @getService(Service.Thermostat)
-          .setCharacteristic(Characteristic.CurrentTemperature, temp)
+        this.setTemperatureTo(temp)
 
       @getService(Service.Thermostat)
         .getCharacteristic(Characteristic.TargetTemperature)
@@ -332,6 +341,8 @@ module.exports = (env) =>
         .on 'set', (value, callback) =>
           env.logger.debug("setting target temperature to " + value)
           device.changeTemperatureTo(value)
+          # this may be the only chance to get a nearly accurate temperature
+          this.setTemperatureTo(value)
           callback()
 
       device.on 'temperatureSetpoint', (target) =>
@@ -367,6 +378,13 @@ module.exports = (env) =>
           env.logger.debug("current thermostat mode changed. Notifying iOS devices.")
           @getService(Service.Thermostat)
             .setCharacteristic(Characteristic.TargetHeatingCoolingState, Characteristic.TargetHeatingCoolingState.AUTO)
+
+    setTemperatureTo: (temp) =>
+      if @_temperature is temp then return
+      @_temperature = temp
+      env.logger.debug("current temperature changed. Notifying iOS devices.")
+      @getService(Service.Thermostat)
+        .setCharacteristic(Characteristic.CurrentTemperature, temp)
 
   class LedLightAccessory extends DeviceAccessory
 
