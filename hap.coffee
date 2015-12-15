@@ -30,7 +30,7 @@ module.exports = (env) =>
 
       @framework.on 'deviceAdded', (device) =>
         env.logger.debug("trying to add device " + device.name)
-        accessory = this.createAccessoryFromTemplate(device)
+        accessory = @createAccessoryFromTemplate(device)
 
         if accessory?
           bridge.addBridgedAccessory(accessory)
@@ -42,7 +42,7 @@ module.exports = (env) =>
         env.logger.debug("pincode is: " + @config.pincode)
 
         bridge.publish({
-          username: this.generateUniqueUsername(bridge.displayName),
+          username: @generateUniqueUsername(bridge.displayName),
           port: @config.port,
           pincode: @config.pincode,
           category: Accessory.Categories.OTHER
@@ -88,7 +88,7 @@ module.exports = (env) =>
         .setCharacteristic(Characteristic.Model, "Rev-1")
         .setCharacteristic(Characteristic.SerialNumber, serialNumber);
       @on 'identify', (paired, callback) =>
-        this.identify(device, paired, callback)
+        @identify(device, paired, callback)
 
     ## default identify method just logs and calls callback
     identify: (device, paired, callback) =>
@@ -105,10 +105,8 @@ module.exports = (env) =>
     handleReturnPromise: (promise, callback, converter) =>
       promise
         .then( (value) =>
-          env.logger.debug("returning value " + value)
           if converter != null
             value = converter(value)
-            env.logger.debug("value converted to " + value)
           callback(null, value)
         )
         .catch( (error) => callback(error, null) )
@@ -135,7 +133,7 @@ module.exports = (env) =>
             device.turnOff() if not state
           )
         )
-      this.handleVoidPromise(promise, callback)
+      @handleVoidPromise(promise, callback)
 
   ##
   # PowerSwitch
@@ -151,13 +149,13 @@ module.exports = (env) =>
           if device._state == value
             callback()
             return
-          env.logger.debug("changing state of " + this.displayName + " to " + value)
-          this.handleVoidPromise(device.changeStateTo(value), callback)
+          env.logger.debug("changing state of " + @displayName + " to " + value)
+          @handleVoidPromise(device.changeStateTo(value), callback)
 
       @getService(Service.Switch)
         .getCharacteristic(Characteristic.On)
         .on 'get', (callback) =>
-          this.handleReturnPromise(device.getState(), callback, null)
+          @handleReturnPromise(device.getState(), callback, null)
 
       device.on 'state', (state) =>
         env.logger.debug("switch state changed. Notifying iOS devices.")
@@ -185,17 +183,17 @@ module.exports = (env) =>
             promise = device.turnOn()
           else
             promise = device.turnOff()
-          this.handleVoidPromise(promise, callback)
+          @handleVoidPromise(promise, callback)
 
       @getService(Service.Lightbulb)
         .getCharacteristic(Characteristic.On)
         .on 'get', (callback) =>
-          this.handleReturnPromise(device.getState(), callback, null)
+          @handleReturnPromise(device.getState(), callback, null)
 
       @getService(Service.Lightbulb)
         .getCharacteristic(Characteristic.Brightness)
         .on 'get', (callback) =>
-          this.handleReturnPromise(device.getDimlevel(), callback, null)
+          @handleReturnPromise(device.getDimlevel(), callback, null)
 
       device.on 'dimlevel', (dimlevel) =>
         env.logger.debug("dimlevel changed. Notifying iOS devices.")
@@ -209,7 +207,7 @@ module.exports = (env) =>
             callback()
             return
           env.logger.debug("changing dimLevel to " + value)
-          this.handleVoidPromise(device.changeDimlevelTo(value), callback)
+          @handleVoidPromise(device.changeDimlevelTo(value), callback)
 
   ##
   # ShutterController
@@ -232,23 +230,23 @@ module.exports = (env) =>
             env.logger.debug("moving shutter down")
             promise = device.moveDown()
           if (promise != null)
-            this.handleVoidPromise(promise, callback)
+            @handleVoidPromise(promise, callback)
 
       @getService(Service.LockMechanism)
         .getCharacteristic(Characteristic.LockTargetState)
         .on 'get', (callback) =>
-          this.handleReturnPromise(device.getPosition(), callback, this.getLockCurrentState)
+          @handleReturnPromise(device.getPosition(), callback, @getLockCurrentState)
 
       # opposite of target position getter
       @getService(Service.LockMechanism)
         .getCharacteristic(Characteristic.LockCurrentState)
         .on 'get', (callback) =>
-          this.handleReturnPromise(device.getPosition(), callback, this.getLockCurrentState)
+          @handleReturnPromise(device.getPosition(), callback, @getLockCurrentState)
 
       device.on 'position', (position) =>
         env.logger.debug("position of shutter changed. Notifying iOS devices.")
         @getService(Service.LockMechanism)
-          .setCharacteristic(Characteristic.LockCurrentState, this.getLockCurrentState(position))
+          .setCharacteristic(Characteristic.LockCurrentState, @getLockCurrentState(position))
 
     getLockCurrentState: (position) =>
             if position == 'up'
@@ -270,12 +268,12 @@ module.exports = (env) =>
       @addService(Service.ContactSensor, device.name)
         .getCharacteristic(Characteristic.ContactSensorState)
         .on 'get', (callback) =>
-          this.handleReturnPromise(device.getContact(), callback, this.getContactSensorState)
+          @handleReturnPromise(device.getContact(), callback, @getContactSensorState)
 
       device.on 'contact', (state) =>
         env.logger.debug("contact sensor state changed. Notifying iOS devices.")
         @getService(Service.ContactSensor)
-          .setCharacteristic(Characteristic.ContactSensorState, this.getContactSensorState(state))
+          .setCharacteristic(Characteristic.ContactSensorState, @getContactSensorState(state))
 
     getContactSensorState: (state) =>
       if state
@@ -294,7 +292,7 @@ module.exports = (env) =>
       @addService(Service.TemperatureSensor, device.name)
         .getCharacteristic(Characteristic.CurrentTemperature)
         .on 'get', (callback) =>
-          this.handleReturnPromise(device.getTemperature(), callback, null)
+          @handleReturnPromise(device.getTemperature(), callback, null)
 
       device.on 'temperature', (temperature) =>
         env.logger.debug("temperature of sensor changed. Notifying iOS devices.")
@@ -329,12 +327,12 @@ module.exports = (env) =>
 
       # some devices report the current temperature
       device.on 'temperature', (temp) =>
-        this.setTemperatureTo(temp)
+        @setTemperatureTo(temp)
 
       @getService(Service.Thermostat)
         .getCharacteristic(Characteristic.TargetTemperature)
         .on 'get', (callback) =>
-          this.handleReturnPromise(device.getTemperatureSetpoint(), callback, null)
+          @handleReturnPromise(device.getTemperatureSetpoint(), callback, null)
 
       @getService(Service.Thermostat)
         .getCharacteristic(Characteristic.TargetTemperature)
@@ -342,7 +340,7 @@ module.exports = (env) =>
           env.logger.debug("setting target temperature to " + value)
           device.changeTemperatureTo(value)
           # this may be the only chance to get a nearly accurate temperature
-          this.setTemperatureTo(value)
+          @setTemperatureTo(value)
           callback()
 
       device.on 'temperatureSetpoint', (target) =>
@@ -395,18 +393,19 @@ module.exports = (env) =>
         .getCharacteristic(Characteristic.On)
         .on 'set', (value, callback) =>
           if device.getState().power == value
+            ## nothing changed
             callback()
             return
-          env.logger.debug("changing state of " + this.displayName + " to " + value)
+          env.logger.debug("changing state of " + @displayName + " to " + value)
           if value
-            this.handleVoidPromise(device.turnOn(), callback)
+            @handleVoidPromise(device.turnOn(), callback)
           else
-            this.handleVoidPromise(device.turnOff(), callback)
+            @handleVoidPromise(device.turnOff(), callback)
 
       @getService(Service.Lightbulb)
         .getCharacteristic(Characteristic.On)
         .on 'get', (callback) =>
-          this.handleReturnPromise(device.getPower(), callback, null)
+          @handleReturnPromise(device.getPower(), callback, null)
 
       device.on 'power', (state) =>
         env.logger.debug("power state changed. Notifying iOS devices.")
@@ -416,7 +415,12 @@ module.exports = (env) =>
       @getService(Service.Lightbulb)
         .getCharacteristic(Characteristic.Brightness)
         .on 'get', (callback) =>
-          this.handleReturnPromise(device.getBrightness(), callback, null)
+          @handleReturnPromise(device.getBrightness(), callback, null)
+
+      @getService(Service.Lightbulb)
+        .getCharacteristic(Characteristic.Brightness)
+        .on 'set', (value, callback) =>
+          @handleVoidPromise(device.setBrightness(value), callback)
 
       device.on 'brightness', (brightness) =>
         env.logger.debug("brightness changed. Notifying iOS devices.")
@@ -426,15 +430,29 @@ module.exports = (env) =>
       @getService(Service.Lightbulb)
         .getCharacteristic(Characteristic.Hue)
         .on 'get', (callback) =>
-          this.handleReturnPromise(device.getColor(), callback, this.convertColor)
+          @handleReturnPromise(device.getColor(), callback, @getHue)
+
+      @getService(Service.Lightbulb)
+        .getCharacteristic(Characteristic.Hue)
+        .on 'set', (value, callback) =>
+          ## use current brightness and hue to set new color
+          device.getBrightness().then( (brightness) =>
+            newColor = Color("hsl(#{value}, 100%, #{brightness}%)")
+            @handleVoidPromise(device.setColor(newColor.rgb()), callback)
+          )
 
       device.on 'color', (hexColor) =>
         env.logger.debug("color changed. Notifying iOS devices.")
-        color = Color(hexColor)
         @getService(Service.Lightbulb)
-          .setCharacteristic(Characteristic.Hue, this.convertColor(hexColor))
+          .setCharacteristic(Characteristic.Hue, @getHue(Color(hexColor).rgb()))
 
-      convertColor: (hexColor) =>
-        return Color(hexColor).hue
+    getHue: (rgb) =>
+      return @fromRgb(rgb).hslArray()[0]
+
+    fromRgb: (rgb) =>
+      ## set to black if not defined
+      if rgb == '' then rgb = [0, 0, 0]
+      return Color(rgb)
+
 
   return plugin
