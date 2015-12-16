@@ -386,8 +386,14 @@ module.exports = (env) =>
 
   class LedLightAccessory extends DeviceAccessory
 
+    _color: null
+
     constructor: (device) ->
       super(device)
+
+      device.getColor().then( (rgb) =>
+        @_color = if rgb == '' then Color("#FFFFFF") else Color(rgb)
+      )
 
       @addService(Service.Lightbulb, device.name)
         .getCharacteristic(Characteristic.On)
@@ -430,29 +436,24 @@ module.exports = (env) =>
       @getService(Service.Lightbulb)
         .getCharacteristic(Characteristic.Hue)
         .on 'get', (callback) =>
-          @handleReturnPromise(device.getColor(), callback, @getHue)
+          callback(null, @getHue())
 
       @getService(Service.Lightbulb)
         .getCharacteristic(Characteristic.Hue)
         .on 'set', (value, callback) =>
-          ## use current brightness and hue to set new color
-          device.getBrightness().then( (brightness) =>
-            newColor = Color("hsl(#{value}, 100%, #{brightness}%)")
-            @handleVoidPromise(device.setColor(newColor.rgb()), callback)
-          )
+          if value == @getHue()
+            callback()
+            return
+          @_color.hue(value)
+          @handleVoidPromise(device.setColor(@_color.hexString()), callback)
 
       device.on 'color', (hexColor) =>
-        env.logger.debug("color changed. Notifying iOS devices.")
+        @_color = Color(hexColor)
+        env.logger.debug("color changed to #{hexColor}. Notifying iOS devices.")
         @getService(Service.Lightbulb)
-          .setCharacteristic(Characteristic.Hue, @getHue(Color(hexColor).rgb()))
+          .setCharacteristic(Characteristic.Hue, @getHue())
 
-    getHue: (rgb) =>
-      return @fromRgb(rgb).hslArray()[0]
-
-    fromRgb: (rgb) =>
-      ## set to black if not defined
-      if rgb == '' then rgb = [0, 0, 0]
-      return Color(rgb)
-
+    getHue: =>
+      return @_color.hslArray()[0]
 
   return plugin
