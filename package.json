@@ -18,7 +18,8 @@
   "configSchema": "hap-config-schema.coffee",
   "dependencies": {
     "hap-nodejs": "0.0.7",
-    "color": "0.10.1"
+    "color": "0.10.1",
+    "pleasejs": "0.4.2"
   },
   "peerDependencies": {
     "pimatic": "0.8.*"

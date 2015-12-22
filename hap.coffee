@@ -7,6 +7,7 @@ module.exports = (env) =>
   path = require 'path'
 
   Color = require 'color'
+  Please = require 'pleasejs'
 
   hap = require 'hap-nodejs'
   Bridge = hap.Bridge
@@ -424,8 +425,8 @@ module.exports = (env) =>
           if value == @getHue()
             callback()
             return
-          @_color.hue(value)
-          @handleVoidPromise(device.setColor(@_color.hexString()), callback)
+          hex = Please.HSV_to_HEX(h: value, s: 1, v: 1)
+          @handleVoidPromise(device.setColor(hex), callback)
 
       device.on 'color', (hexColor) =>
         @_color = if hexColor == '' then Color("#FFFFFF") else Color(hexColor)
