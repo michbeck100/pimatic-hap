@@ -29,7 +29,6 @@ module.exports = (env) =>
         callback()
 
       @framework.on 'deviceAdded', (device) =>
-        env.logger.debug("trying to add device " + device.name)
         accessory = @createAccessoryFromTemplate(device)
 
         if accessory?
@@ -90,9 +89,8 @@ module.exports = (env) =>
       @on 'identify', (paired, callback) =>
         @identify(device, paired, callback)
 
-    ## default identify method just logs and calls callback
+    ## default identify method just calls callback
     identify: (device, paired, callback) =>
-      env.logger.debug("identify " + device.name)
       callback()
 
     ## calls promise, then callback, and handles errors
@@ -120,7 +118,6 @@ module.exports = (env) =>
 
     # default identify method on switches turns the switch on and off two times
     identify: (device, paired, callback) =>
-      env.logger.debug("blinking " + device.name + " twice for identification")
       # make sure it's off, then turn on and off twice
       promise = device.getState()
         .then( (state) =>
@@ -149,7 +146,6 @@ module.exports = (env) =>
           if device._state == value
             callback()
             return
-          env.logger.debug("changing state of " + @displayName + " to " + value)
           @handleVoidPromise(device.changeStateTo(value), callback)
 
       @getService(Service.Switch)
@@ -158,7 +154,6 @@ module.exports = (env) =>
           @handleReturnPromise(device.getState(), callback, null)
 
       device.on 'state', (state) =>
-        env.logger.debug("switch state changed. Notifying iOS devices.")
         @getService(Service.Switch)
           .setCharacteristic(Characteristic.On, state)
 
@@ -177,7 +172,6 @@ module.exports = (env) =>
           if device._state == value
             callback()
             return
-          env.logger.debug("changing state to " + value)
           promise = null
           if value
             promise = device.turnOn()
@@ -196,7 +190,6 @@ module.exports = (env) =>
           @handleReturnPromise(device.getDimlevel(), callback, null)
 
       device.on 'dimlevel', (dimlevel) =>
-        env.logger.debug("dimlevel changed. Notifying iOS devices.")
         @getService(Service.Lightbulb)
           .setCharacteristic(Characteristic.Brightness, dimlevel)
 
@@ -206,7 +199,6 @@ module.exports = (env) =>
           if device._dimlevel == value
             callback()
             return
-          env.logger.debug("changing dimLevel to " + value)
           @handleVoidPromise(device.changeDimlevelTo(value), callback)
 
   ##
@@ -224,10 +216,8 @@ module.exports = (env) =>
         .on 'set', (value, callback) =>
           promise = null
           if value == Characteristic.LockTargetState.UNSECURED
-            env.logger.debug("moving shutter up")
             promise = device.moveUp()
           else if value == Characteristic.LockTargetState.SECURED
-            env.logger.debug("moving shutter down")
             promise = device.moveDown()
           if (promise != null)
             @handleVoidPromise(promise, callback)
@@ -244,7 +234,6 @@ module.exports = (env) =>
           @handleReturnPromise(device.getPosition(), callback, @getLockCurrentState)
 
       device.on 'position', (position) =>
-        env.logger.debug("position of shutter changed. Notifying iOS devices.")
         @getService(Service.LockMechanism)
           .setCharacteristic(Characteristic.LockCurrentState, @getLockCurrentState(position))
 
@@ -271,7 +260,6 @@ module.exports = (env) =>
           @handleReturnPromise(device.getContact(), callback, @getContactSensorState)
 
       device.on 'contact', (state) =>
-        env.logger.debug("contact sensor state changed. Notifying iOS devices.")
         @getService(Service.ContactSensor)
           .setCharacteristic(Characteristic.ContactSensorState, @getContactSensorState(state))
 
@@ -295,7 +283,6 @@ module.exports = (env) =>
           @handleReturnPromise(device.getTemperature(), callback, null)
 
       device.on 'temperature', (temperature) =>
-        env.logger.debug("temperature of sensor changed. Notifying iOS devices.")
         @getService(Service.TemperatureSensor)
           .setCharacteristic(Characteristic.CurrentTemperature, temperature)
 
@@ -337,14 +324,12 @@ module.exports = (env) =>
       @getService(Service.Thermostat)
         .getCharacteristic(Characteristic.TargetTemperature)
         .on 'set', (value, callback) =>
-          env.logger.debug("setting target temperature to " + value)
           device.changeTemperatureTo(value)
           # this may be the only chance to get a nearly accurate temperature
           @setTemperatureTo(value)
           callback()
 
       device.on 'temperatureSetpoint', (target) =>
-        env.logger.debug("target temperature changed. Notifying iOS devices.")
         @getService(Service.Thermostat)
           .setCharacteristic(Characteristic.TargetTemperature, target)
 
@@ -373,14 +358,12 @@ module.exports = (env) =>
 
       device.on 'mode', (mode) =>
         if mode == "auto"
-          env.logger.debug("current thermostat mode changed. Notifying iOS devices.")
           @getService(Service.Thermostat)
             .setCharacteristic(Characteristic.TargetHeatingCoolingState, Characteristic.TargetHeatingCoolingState.AUTO)
 
     setTemperatureTo: (temp) =>
       if @_temperature is temp then return
       @_temperature = temp
-      env.logger.debug("current temperature changed. Notifying iOS devices.")
       @getService(Service.Thermostat)
         .setCharacteristic(Characteristic.CurrentTemperature, temp)
 
@@ -402,7 +385,6 @@ module.exports = (env) =>
             ## nothing changed
             callback()
             return
-          env.logger.debug("changing state of " + @displayName + " to " + value)
           if value
             @handleVoidPromise(device.turnOn(), callback)
           else
@@ -414,7 +396,6 @@ module.exports = (env) =>
           @handleReturnPromise(device.getPower(), callback, null)
 
       device.on 'power', (state) =>
-        env.logger.debug("power state changed. Notifying iOS devices.")
         @getService(Service.Lightbulb)
           .setCharacteristic(Characteristic.On, state == 'on')
 
@@ -429,7 +410,6 @@ module.exports = (env) =>
           @handleVoidPromise(device.setBrightness(value), callback)
 
       device.on 'brightness', (brightness) =>
-        env.logger.debug("brightness changed. Notifying iOS devices.")
         @getService(Service.Lightbulb)
           .setCharacteristic(Characteristic.Brightness, brightness)
 
@@ -449,7 +429,6 @@ module.exports = (env) =>
 
       device.on 'color', (hexColor) =>
         @_color = Color(hexColor)
-        env.logger.debug("color changed to #{hexColor}. Notifying iOS devices.")
         @getService(Service.Lightbulb)
           .setCharacteristic(Characteristic.Hue, @getHue())
 
