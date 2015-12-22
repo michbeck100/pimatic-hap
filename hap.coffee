@@ -64,7 +64,7 @@ module.exports = (env) =>
     createAccessoryFromTemplate: (device) =>
       return switch device.template
         when 'dimmer' then new DimmerAccessory(device)
-        when 'switch' then new SwitchAccessory(device)
+        when 'switch' then new PowerSwitchAccessory(device)
         when 'shutter' then new ShutterAccessory(device)
         when 'temperature' then new TemperatureAccessory(device)
         when 'contact' then new ContactAccessory(device)
@@ -368,7 +368,7 @@ module.exports = (env) =>
       @getService(Service.Thermostat)
         .setCharacteristic(Characteristic.CurrentTemperature, temp)
 
-  class LedLightAccessory extends DeviceAccessory
+  class LedLightAccessory extends SwitchAccessory
 
     _color: null
 
