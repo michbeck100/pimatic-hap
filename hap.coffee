@@ -428,7 +428,7 @@ module.exports = (env) =>
           @handleVoidPromise(device.setColor(@_color.hexString()), callback)
 
       device.on 'color', (hexColor) =>
-        @_color = Color(hexColor)
+        @_color = if hexColor == '' then Color("#FFFFFF") else Color(hexColor)
         @getService(Service.Lightbulb)
           .setCharacteristic(Characteristic.Hue, @getHue())
 
