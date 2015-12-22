@@ -304,7 +304,7 @@ module.exports = (env) =>
   ##
   class ThermostatAccessory extends DeviceAccessory
 
-    _temperature: -273
+    _temperature: null
 
     constructor: (device) ->
       super(device)
@@ -317,7 +317,7 @@ module.exports = (env) =>
       @getService(Service.Thermostat)
         .getCharacteristic(Characteristic.CurrentTemperature)
         .on 'get', (callback) =>
-          if @_temperature == -273
+          if @_temperature == null
             device.getTemperatureSetpoint().then( (temp) =>
                 @_temperature = temp
                 callback(null, @_temperature)
