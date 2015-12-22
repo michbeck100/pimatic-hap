@@ -29,6 +29,27 @@ Do you like this plugin? Then consider a donation to support development.
 <span class="badge-paypal"><a href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=2T48JXA589B4Y" title="Donate to this project using Paypal"><img src="https://img.shields.io/badge/paypal-donate-yellow.svg" alt="PayPal donate button" /></a></span>
 
 ### Changelog
+0.4.0
+* When setting target temperature, remember the value as current temperature. This is as close as we can get, if device doesn't emit temperature value.
+* Notifying iOS devices directly when changing target temperature
+* Deleted debug log statements
+* determine device type by template, first implementation for BaseLedLight devices
+* Added LedLightAccessory
+
+0.3.4
+* Ensure that hap database is always at the same place
+
+0.3.3
+* Notifying iOS devices actively once temperature changes
+* Fixed null check
+
+0.3.2
+* #7 Explicitly calling method with all parameters
+
+0.3.1
+* Updated hap-nodejs dependency to 0.0.7, this changes transitive dependency to node-persist to ^0.0.6
+* Fixed error when checking if converter is defined
+* Fixed possible infinite loops when device state change triggers iOS notification and notification triggers state change
 
 0.3.0
 * [#4](https://github.com/michbeck100/pimatic-hap/issues/4) refactored use of promises
