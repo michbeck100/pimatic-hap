@@ -22,3 +22,14 @@ module.exports = (env) ->
       device.on 'temperature', (temperature) =>
         @getService(Service.TemperatureSensor)
           .setCharacteristic(Characteristic.CurrentTemperature, temperature)
+
+      # some devices also measure humidity
+      if device.hasAttribute('humidity')
+        @addService(Service.CurrentRelativeHumidity, device.name)
+          .getCharacteristic(Characteristic.CurrentRelativeHumidity)
+          .on 'get', (callback) =>
+            @handleReturnPromise(device.getHumidity(), callback, null)
+
+        device.on 'humidity', (humidity) =>
+          @getService(Service.CurrentRelativeHumidity)
+            .setCharacteristic(Characteristic.CurrentRelativeHumidity, humidity)
