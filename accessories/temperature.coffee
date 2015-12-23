@@ -25,11 +25,11 @@ module.exports = (env) ->
 
       # some devices also measure humidity
       if device.hasAttribute('humidity')
-        @addService(Service.CurrentRelativeHumidity, device.name)
+        @addService(Service.HumiditySensor, device.name)
           .getCharacteristic(Characteristic.CurrentRelativeHumidity)
           .on 'get', (callback) =>
             @handleReturnPromise(device.getHumidity(), callback, null)
 
         device.on 'humidity', (humidity) =>
-          @getService(Service.CurrentRelativeHumidity)
+          @getService(Service.HumiditySensor)
             .setCharacteristic(Characteristic.CurrentRelativeHumidity, humidity)
