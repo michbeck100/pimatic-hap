@@ -1,3 +1,5 @@
+# activate HAP-NodeJS logging
+process.env['DEBUG'] = 'HAPServer,Accessory,EventedHttpServer'
 
 module.exports = (env) =>
 
@@ -21,6 +23,11 @@ module.exports = (env) =>
   Service = hap.Service
   Characteristic = hap.Characteristic
   uuid = require ('hap-nodejs/lib/util/uuid')
+
+  # bind hap-nodejs' debug logging to pimatic logger
+  Debug = require ('hap-nodejs/node_modules/debug')
+  Debug.log = env.logger.debug.bind(env.logger)
+  Debug.formatArgs = () => arguments
 
   class HapPlugin extends env.plugins.Plugin
 
