@@ -17,10 +17,8 @@ module.exports = (env) ->
       @addService(Service.Switch, device.name)
         .getCharacteristic(Characteristic.On)
         .on 'set', (value, callback) =>
-          if device._state == value
-            callback()
-            return
-          @handleVoidPromise(device.changeStateTo(value), callback)
+          promise = if value then device.turnOn() else device.turnOff()
+          @handleVoidPromise(promise, callback)
 
       @getService(Service.Switch)
         .getCharacteristic(Characteristic.On)
