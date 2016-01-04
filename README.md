@@ -29,6 +29,14 @@ Do you like this plugin? Then consider a donation to support development.
 <span class="badge-paypal"><a href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=2T48JXA589B4Y" title="Donate to this project using Paypal"><img src="https://img.shields.io/badge/paypal-donate-yellow.svg" alt="PayPal donate button" /></a></span>
 
 ### Changelog
+0.5.0
+* #12 added support for humidity sensors that use the temperature device
+* debug logging of hap-nodejs bound to pimatic logger
+* #14: using turnOn and turnOff methods for switches
+
+0.4.1
+* Minor bugfixes
+
 0.4.0
 * When setting target temperature, remember the value as current temperature. This is as close as we can get, if device doesn't emit temperature value.
 * Notifying iOS devices directly when changing target temperature
