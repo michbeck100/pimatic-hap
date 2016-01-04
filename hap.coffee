@@ -7,6 +7,7 @@ module.exports = (env) =>
   ContactAccessory = require('./accessories/contact')(env)
   DimmerAccessory = require('./accessories/dimmer')(env)
   LedLightAccessory = require('./accessories/ledlight')(env)
+  MotionAccessory = require('./accessories/motion')(env)
   PowerSwitchAccessory = require('./accessories/powerswitch')(env)
   ShutterAccessory = require('./accessories/shutter')(env)
   TemperatureAccessory = require('./accessories/temperature')(env)
@@ -83,6 +84,7 @@ module.exports = (env) =>
         when 'contact' then new ContactAccessory(device)
         when 'thermostat' then new ThermostatAccessory(device)
         when 'led-light' then new LedLightAccessory(device)
+        when 'presence' then new MotionAccessory(device)
         else
           env.logger.debug("unsupported device type: " + device.constructor.name)
           null
