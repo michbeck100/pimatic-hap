@@ -4,9 +4,11 @@
   "author": "Michael Kotten <michaelkotten@gmail.com> (https://github.com/michbeck100/pimatic-hap)",
   "main": "hap.coffee",
   "files": [
+    "accessories",
     "hap.coffee",
     "README.md",
-    "hap-config-schema.coffee"
+    "hap-config-schema.coffee",
+    "LICENSE"
   ],
   "version": "0.5.0",
   "homepage": "https://github.com/michbeck100/pimatic-hap",
