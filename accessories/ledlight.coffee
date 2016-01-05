@@ -66,8 +66,13 @@ module.exports = (env) ->
           if value == @getHue()
             callback()
             return
-          hex = Please.HSV_to_HEX(h: value, s: 1, v: 1)
-          @handleVoidPromise(device.setColor(hex), callback)
+          
+          if device.hasAction("setColor")
+            hex = Please.HSV_to_HEX(h: value, s: 1, v: 1)
+            @handleVoidPromise(device.setColor(hex), callback)
+            
+          if device.hasAction("setHue")
+            @handleVoidPromise(device.setHUE(value), callback)
 
       @getService(Service.Lightbulb)
         .getCharacteristic(Characteristic.Saturation)
@@ -75,8 +80,13 @@ module.exports = (env) ->
           if value == @getSaturation()
             callback()
             return
-          hex = Please.HSV_to_HEX(h: @getHue(), s: 1, v: 1)
-          @handleVoidPromise(device.setColor(hex), callback)
+            
+          if device.hasAction("setColor")
+            hex = Please.HSV_to_HEX(h: @getHue(), s: 1, v: 1)
+            @handleVoidPromise(device.setColor(hex), callback)
+            
+          if device.hasAction("setSaturation")
+            @handleVoidPromise(device.setSaturation(value), callback)
       
       @getService(Service.Lightbulb)
         .getCharacteristic(Characteristic.Saturation)
@@ -89,6 +99,12 @@ module.exports = (env) ->
           .setCharacteristic(Characteristic.Hue, @getHue())
         @getService(Service.Lightbulb)
           .setCharacteristic(Characteristic.Saturation, @getSaturation())
+      
+      
+#      device.on 'hue', (hue) =>
+#        @_color = 
+#        @getService(Service.Lightbulb)
+#          .setCharacteristic(Characteristic.Hue, @getHue())
           
     getHue: =>
       return @_color.hslArray()[0]
