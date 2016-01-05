@@ -69,10 +69,29 @@ module.exports = (env) ->
           hex = Please.HSV_to_HEX(h: value, s: 1, v: 1)
           @handleVoidPromise(device.setColor(hex), callback)
 
+      @getService(Service.Lightbulb)
+        .getCharacteristic(Characteristic.Saturation)
+        .on 'set', (value, callback) =>
+          if value == @getSaturation()
+            callback()
+            return
+          hex = Please.HSV_to_HEX(h: @getHue(), s: 1, v: 1)
+          @handleVoidPromise(device.setColor(hex), callback)
+      
+      @getService(Service.Lightbulb)
+        .getCharacteristic(Characteristic.Saturation)
+        .on 'get', (callback) =>
+          callback(null, @getSaturation())
+
       device.on 'color', (hexColor) =>
         @_color = if hexColor == '' then Color("#FFFFFF") else Color(hexColor)
         @getService(Service.Lightbulb)
           .setCharacteristic(Characteristic.Hue, @getHue())
-
+        @getService(Service.Lightbulb)
+          .setCharacteristic(Characteristic.Saturation, @getSaturation())
+          
     getHue: =>
       return @_color.hslArray()[0]
+      
+    getSaturation: =>
+      return @_color.hslArray()[1]
