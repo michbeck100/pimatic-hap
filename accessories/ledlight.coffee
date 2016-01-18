@@ -76,3 +76,19 @@ module.exports = (env) ->
 
     getHue: =>
       return @_color.hslArray()[0]
+
+    # identify method toggles the light on and off two times
+    identify: (device, paired, callback) =>
+      delay = 500
+      promise = device.getPower()
+        .then( (state) =>
+          device.turnOff().delay(delay)
+          .then( => device.turnOn().delay(delay) )
+          .then( => device.turnOff().delay(delay) )
+          .then( => device.turnOn().delay(delay) )
+          .then( =>
+            # recover initial state
+            device.turnOff().delay(delay) if not state
+          )
+        )
+      @handleVoidPromise(promise, callback)
