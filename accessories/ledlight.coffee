@@ -1,7 +1,6 @@
 module.exports = (env) ->
 
-  Color = require 'color'
-  Please = require 'pleasejs'
+  convert = require 'color-convert'
 
   hap = require 'hap-nodejs'
   Service = hap.Service
@@ -11,13 +10,14 @@ module.exports = (env) ->
 
   class LedLightAccessory extends SwitchAccessory
 
+    # hsv value of current color
     _color: null
 
     constructor: (device) ->
       super(device)
 
       device.getColor().then( (rgb) =>
-        @_color = if rgb == '' then Color("#FFFFFF") else Color(rgb)
+        @_color = convert.rgb.hsv(if rgb == '' then [255, 255, 255] else rgb)
       )
 
       @addService(Service.Lightbulb, device.name)
@@ -49,6 +49,7 @@ module.exports = (env) ->
       @getService(Service.Lightbulb)
         .getCharacteristic(Characteristic.Brightness)
         .on 'set', (value, callback) =>
+          @_color[2] = value
           @handleVoidPromise(device.setBrightness(value), callback)
 
       device.on 'brightness', (brightness) =>
@@ -66,16 +67,40 @@ module.exports = (env) ->
           if value == @getHue()
             callback()
             return
-          hex = Please.HSV_to_HEX(h: value, s: 1, v: 1)
-          @handleVoidPromise(device.setColor(hex), callback)
+          @_color[0] = value
+          hex = convert.hsv.hex(@_color)
+          @handleVoidPromise(device.setColor('#' + hex), callback)
 
       device.on 'color', (hexColor) =>
-        @_color = if hexColor == '' then Color("#FFFFFF") else Color(hexColor)
+        @_color = convert.hex.hsv(if hexColor == '' then '#FFFFFF' else hexColor)
         @getService(Service.Lightbulb)
           .setCharacteristic(Characteristic.Hue, @getHue())
+          .setCharacteristic(Characteristic.Saturation, @getSaturation())
+          .setCharacteristic(Characteristic.Brightness, @getBrightness())
+
+      @getService(Service.Lightbulb)
+        .getCharacteristic(Characteristic.Saturation)
+        .on 'get', (callback) =>
+          callback(null, @getSaturation())
+
+      @getService(Service.Lightbulb)
+        .getCharacteristic(Characteristic.Saturation)
+        .on 'set', (value, callback) =>
+          if value == @getSaturation()
+            callback()
+            return
+          @_color[1] = value
+          hex = convert.hsv.hex(@_color)
+          @handleVoidPromise(device.setColor('#' + hex), callback)
 
     getHue: =>
-      return @_color.hslArray()[0]
+      return @_color[0]
+
+    getSaturation: =>
+      return @_color[1]
+
+    getBrightness: =>
+      return @_color[2]
 
     # identify method toggles the light on and off two times
     identify: (device, paired, callback) =>
