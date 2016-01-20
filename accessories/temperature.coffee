@@ -18,6 +18,7 @@ module.exports = (env) ->
         .getCharacteristic(Characteristic.CurrentTemperature)
         .on 'get', (callback) =>
           @handleReturnPromise(device.getTemperature(), callback, null)
+        .props.minValue = -50
 
       device.on 'temperature', (temperature) =>
         @getService(Service.TemperatureSensor)
