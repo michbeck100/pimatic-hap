@@ -17,6 +17,9 @@ module.exports = (env) ->
       @addService(Service.Lightbulb, device.name)
         .getCharacteristic(Characteristic.On)
         .on 'set', (value, callback) =>
+          if device._state == value
+            callback()
+            return
           promise = if value then device.turnOn() else device.turnOff()
           @handleVoidPromise(promise, callback)
 
@@ -24,6 +27,10 @@ module.exports = (env) ->
         .getCharacteristic(Characteristic.On)
         .on 'get', (callback) =>
           @handleReturnPromise(device.getState(), callback, null)
+
+      device.on 'state', (state) =>
+        @getService(Service.Lightbulb)
+          .setCharacteristic(Characteristic.On, state)
 
       @getService(Service.Lightbulb)
         .getCharacteristic(Characteristic.Brightness)
