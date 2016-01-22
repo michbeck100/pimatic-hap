@@ -29,6 +29,16 @@ Do you like this plugin? Then consider a donation to support development.
 <span class="badge-paypal"><a href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=2T48JXA589B4Y" title="Donate to this project using Paypal"><img src="https://img.shields.io/badge/paypal-donate-yellow.svg" alt="PayPal donate button" /></a></span>
 
 ### Changelog
+0.5.2
+* #9 setting state when dim level changes
+* #18 fixed identify for led lights
+* #15 Added Saturation, so Siri changes colors.
+* #22 Supporting a min temperature of -50 degrees
+* Moved to color-convert as single dependency for color computations.
+
+0.5.1
+* Added support for motion sensors
+
 0.5.0
 * #12 added support for humidity sensors that use the temperature device
 * debug logging of hap-nodejs bound to pimatic logger
