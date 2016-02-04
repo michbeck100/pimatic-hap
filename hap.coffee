@@ -32,6 +32,17 @@ module.exports = (env) =>
 
   class HapPlugin extends env.plugins.Plugin
 
+    knownDevices: {
+      'dimmer': DimmerAccessory
+      'switch': PowerSwitchAccessory
+      'shutter': ShutterAccessory
+      'temperature': TemperatureAccessory
+      'contact': ContactAccessory
+      'thermostat': ThermostatAccessory
+      'led-light': LedLightAccessory
+      'presence': MotionAccessory
+    }
+
     init: (app, @framework, @config) =>
       env.logger.info("Starting homekit bridge")
 
@@ -62,6 +73,22 @@ module.exports = (env) =>
           category: Accessory.Categories.OTHER
         })
 
+      @framework.deviceManager.on "registerDeviceClass", (classInfo) =>
+        classInfo.configDef.properties.hap = {
+          type: "object"
+          required: false
+          properties:
+            service:
+              description: "The homekit service to be used for this device"
+              type: "string"
+              required: false
+              enum: ["Lightbulb", "Switch"]
+            exclude:
+              description: "Whether to exclude this device from being bridged"
+              type: "boolean"
+              default: false
+        }
+      
     generateUniqueUsername: (name) =>
       shasum = crypto.createHash('sha1')
       shasum.update(name)
@@ -76,18 +103,14 @@ module.exports = (env) =>
           hash[10] + hash[11]
 
     createAccessoryFromTemplate: (device) =>
-      return switch device.template
-        when 'dimmer' then new DimmerAccessory(device)
-        when 'switch' then new PowerSwitchAccessory(device)
-        when 'shutter' then new ShutterAccessory(device)
-        when 'temperature' then new TemperatureAccessory(device)
-        when 'contact' then new ContactAccessory(device)
-        when 'thermostat' then new ThermostatAccessory(device)
-        when 'led-light' then new LedLightAccessory(device)
-        when 'presence' then new MotionAccessory(device)
-        else
-          env.logger.debug("unsupported device type: " + device.constructor.name)
-          null
+      if @isKnownDevice(device)
+        return new @knownDevices[device.template](device)
+      else
+        env.logger.debug("unsupported device type: " + device.constructor.name)
+        return null
+
+    isKnownDevice: (device) =>
+      return device.template of @knownDevices
 
   plugin = new HapPlugin()
 
