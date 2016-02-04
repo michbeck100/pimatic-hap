@@ -19,7 +19,7 @@
   },
   "configSchema": "hap-config-schema.coffee",
   "dependencies": {
-    "hap-nodejs": "0.0.7",
+    "hap-nodejs": "0.1.8",
     "color-convert": "1.0.0"
   },
   "peerDependencies": {
