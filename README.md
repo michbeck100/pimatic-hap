@@ -45,7 +45,7 @@ Do you like this plugin? Then consider a donation to support development.
 0.5.0
 * [#12](https://github.com/michbeck100/pimatic-hap/issues/12) added support for humidity sensors that use the temperature device
 * debug logging of hap-nodejs bound to pimatic logger
-* #14: using turnOn and turnOff methods for switches
+* [#14](https://github.com/michbeck100/pimatic-hap/issues/14): using turnOn and turnOff methods for switches
 
 0.4.1
 * Minor bugfixes
