@@ -1,3 +1,7 @@
+[![Build Status](http://img.shields.io/travis/michbeck100/pimatic-hap/master.svg)](https://travis-ci.org/michbeck100/pimatic-hap)
+[![Version](https://img.shields.io/npm/v/pimatic-hap.svg)](https://img.shields.io/npm/v/pimatic-hap.svg)
+
+
 pimatic-hap
 =======================
 
@@ -29,6 +33,9 @@ Do you like this plugin? Then consider a donation to support development.
 <span class="badge-paypal"><a href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=2T48JXA589B4Y" title="Donate to this project using Paypal"><img src="https://img.shields.io/badge/paypal-donate-yellow.svg" alt="PayPal donate button" /></a></span>
 
 ### Changelog
+0.5.4
+* Fixed category of homekit bridge accessory
+
 0.5.3
 * Updated hap-nodejs to 0.1.8
 
