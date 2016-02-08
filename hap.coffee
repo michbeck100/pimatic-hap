@@ -59,7 +59,7 @@ module.exports = (env) =>
           username: @generateUniqueUsername(bridge.displayName),
           port: @config.port,
           pincode: @config.pincode,
-          category: Accessory.Categories.OTHER
+          category: Accessory.Categories.BRIDGE
         })
 
     generateUniqueUsername: (name) =>
