@@ -73,6 +73,7 @@ module.exports = (env) =>
           category: Accessory.Categories.BRIDGE
         })
 
+      ### currently not possible. see https://github.com/pimatic/pimatic/issues/803
       @framework.deviceManager.on "registerDeviceClass", (classInfo) =>
         classInfo.configDef.properties.hap = {
           type: "object"
@@ -88,7 +89,8 @@ module.exports = (env) =>
               type: "boolean"
               default: false
         }
-      
+      ###
+
     generateUniqueUsername: (name) =>
       shasum = crypto.createHash('sha1')
       shasum.update(name)
