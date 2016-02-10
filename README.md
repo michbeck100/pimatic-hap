@@ -26,6 +26,34 @@ Please use 031-45-154 as pin, when pairing with the pimatic homekit bridge.
 
 Every iOS app that works with homekit should work with this (like Elgato Eve), so no need for an Apple developer account.
 
+#### Configuration
+
+The configuration of pimatic can be extended by adding an attribute called "hap" on every supported device.
+Example:
+
+```json
+"devices": [
+  {
+    "id": "switch",
+    "class": "DummySwitch",
+    "name": "Switch",
+    "hap": {
+      "service": "Lightbulb",
+      "exclude": true
+    }
+  }
+]
+
+```
+To exclude devices from being registered as Homekit Accessory, just set the "exclude" flag to true. By default all supported devices will be registered.
+
+For some devices it's possible to override the default Service (find the explanation of Services [here](https://github.com/KhaosT/HAP-NodeJS#api)).
+This is helpful if e.g. a lamp is connected to a pimatic-enabled outlet. Changing the Service to "Lightbulb" will make Homekit recognize the outlet as light, not as switch. This may also change the commands, that one can use with Siri. 
+
+Since the "hap" attribute doesn't belong to the device config schema, pimatic will issue a warning,
+that this is an unknown config entry. Maybe it will be officially possible to extend the configuration. Since then just ignore this warning.
+
+
 ### Sponsoring
 
 Do you like this plugin? Then consider a donation to support development.

@@ -9,7 +9,14 @@ module.exports = (env) ->
   # base class for all homekit accessories in pimatic
   class BaseAccessory extends Accessory
 
+    supportedServiceOverrides: {
+      "Lightbulb": Service.Lightbulb
+    }
+
+    hapConfig: null
+
     constructor: (device) ->
+      @hapConfig = device.config.hap
       serialNumber = uuid.generate('pimatic-hap:accessories:' + device.id)
       super(device.name, serialNumber)
       # accessories are reachable as long as the server lives
@@ -57,3 +64,13 @@ module.exports = (env) ->
           callback(error, null)
         )
         .done()
+
+    exclude: =>
+      if @hapConfig != null && @hapConfig != undefined
+        return @hapConfig.exclude != null && @hapConfig.exclude
+      return false
+
+    getServiceOverride: (service) =>
+      if @hapConfig != null && @hapConfig != undefined && @hapConfig.service != null && @hapConfig.service != undefined && @hapConfig.service of @supportedServiceOverrides
+        return @supportedServiceOverrides[@hapConfig.service]
+      return service

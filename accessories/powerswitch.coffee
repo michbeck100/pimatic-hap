@@ -14,17 +14,19 @@ module.exports = (env) ->
     constructor: (device) ->
       super(device)
 
-      @addService(Service.Switch, device.name)
+      service = @getServiceOverride(Service.Switch)
+
+      @addService(service, device.name)
         .getCharacteristic(Characteristic.On)
         .on 'set', (value, callback) =>
           promise = if value then device.turnOn() else device.turnOff()
           @handleVoidPromise(promise, callback)
 
-      @getService(Service.Switch)
+      @getService(service)
         .getCharacteristic(Characteristic.On)
         .on 'get', (callback) =>
           @handleReturnPromise(device.getState(), callback, null)
 
       device.on 'state', (state) =>
-        @getService(Service.Switch)
+        @getService(service)
           .setCharacteristic(Characteristic.On, state)
