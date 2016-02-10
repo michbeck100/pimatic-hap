@@ -12,11 +12,20 @@ module.exports = (env) ->
     constructor: (device) ->
       serialNumber = uuid.generate('pimatic-hap:accessories:' + device.id)
       super(device.name, serialNumber)
+      # accessories are reachable as long as the server lives
+      this.reachable = true
 
       @getService(Service.AccessoryInformation)
         .setCharacteristic(Characteristic.Manufacturer, "Pimatic")
         .setCharacteristic(Characteristic.Model, "Rev-1")
         .setCharacteristic(Characteristic.SerialNumber, serialNumber);
+
+      @addService(Service.BridgingState)
+        .getCharacteristic(Characteristic.Reachable)
+        .on 'set', (value, callback) =>
+          env.logger.warn 'accessory ' + device.id + ' was set to unreachable!' unless value
+          callback()
+
       @on 'identify', (paired, callback) =>
         @identify(device, paired, callback)
 
@@ -28,7 +37,11 @@ module.exports = (env) ->
     handleVoidPromise: (promise, callback) =>
       promise
         .then( => callback() )
-        .catch( (error) => callback(error) )
+        .catch( (error) =>
+          env.logger.error "Could not call promise: " + error.message
+          env.logger.debug error.stack
+          callback(error)
+        )
         .done()
 
     handleReturnPromise: (promise, callback, converter) =>
@@ -38,5 +51,9 @@ module.exports = (env) ->
             value = converter(value)
           callback(null, value)
         )
-        .catch( (error) => callback(error, null) )
+        .catch( (error) =>
+          env.logger.error "Could not call promise: " + error.message
+          env.logger.debug error.stack
+          callback(error, null)
+        )
         .done()
