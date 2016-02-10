@@ -34,6 +34,13 @@ Do you like this plugin? Then consider a donation to support development.
 [![Flattr pimatic-hap](http://api.flattr.com/button/flattr-badge-large.png)](https://flattr.com/submit/auto?user_id=michbeck100&url=https://github.com/michbeck100/pimatic-hap&title=pimatic-hap&language=&tags=github&category=software)
 
 ### Changelog
+0.5.6
+* Setting every accessory to reachable by default and logging a warning if the reachability changes.
+* Added added error logging if promises throw an error
+
+0.5.5
+* Updated hap-nodejs to 0.2.0
+
 0.5.4
 * Fixed category of homekit bridge accessory
 
