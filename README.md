@@ -48,7 +48,7 @@ Example:
 To exclude devices from being registered as Homekit Accessory, just set the "exclude" flag to true. By default all supported devices will be registered.
 
 For some devices it's possible to override the default Service (find the explanation of Services [here](https://github.com/KhaosT/HAP-NodeJS#api)).
-This is helpful if e.g. a lamp is connected to a pimatic-enabled outlet. Changing the Service to "Lightbulb" will make Homekit recognize the outlet as light, not as switch. This may also change the commands, that one can use with Siri. 
+This is helpful if e.g. a lamp is connected to a pimatic-enabled outlet. Changing the Service to "Lightbulb" will make Homekit recognize the outlet as light, not as switch. This may also change the commands, that one can use with Siri.
 
 Since the "hap" attribute doesn't belong to the device config schema, pimatic will issue a warning,
 that this is an unknown config entry. Maybe it will be officially possible to extend the configuration. Since then just ignore this warning.
@@ -62,6 +62,10 @@ Do you like this plugin? Then consider a donation to support development.
 [![Flattr pimatic-hap](http://api.flattr.com/button/flattr-badge-large.png)](https://flattr.com/submit/auto?user_id=michbeck100&url=https://github.com/michbeck100/pimatic-hap&title=pimatic-hap&language=&tags=github&category=software)
 
 ### Changelog
+0.6.0
+* [#20](https://github.com/michbeck100/pimatic-hap/issues/20), [#23](https://github.com/michbeck100/pimatic-hap/issues/23) added config options to exclude devices from homekit and to override service. For now just power switches can be set to Lightbulb instead of Switch.
+* Updated hap-nodejs dependency to 0.2.5
+
 0.5.6
 * Setting every accessory to reachable by default and logging a warning if the reachability changes.
 * Added added error logging if promises throw an error
