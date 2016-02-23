@@ -19,8 +19,6 @@ module.exports = (env) ->
       @hapConfig = device.config.hap
       serialNumber = uuid.generate('pimatic-hap:accessories:' + device.id)
       super(device.name, serialNumber)
-      # accessories are reachable as long as the server lives
-      this.reachable = true
 
       @getService(Service.AccessoryInformation)
         .setCharacteristic(Characteristic.Manufacturer, "Pimatic")
