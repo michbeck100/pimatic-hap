@@ -57,7 +57,7 @@ module.exports = (env) =>
       @framework.on 'deviceAdded', (device) =>
         accessory = @createAccessoryFromTemplate(device)
 
-        if !accessory?.exclude()
+        if accessory? && !accessory.exclude()
           bridge.addBridgedAccessory(accessory)
           env.logger.debug("successfully added device " + device.name)
 
