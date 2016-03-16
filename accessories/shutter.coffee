@@ -43,10 +43,10 @@ module.exports = (env) ->
           .setCharacteristic(Characteristic.LockCurrentState, @getLockCurrentState(position))
 
     getLockCurrentState: (position) =>
-            if position == 'up'
-              return Characteristic.LockCurrentState.UNSECURED
-            else if position == "down"
-              return Characteristic.LockCurrentState.SECURED
-            else
-              # stopped somewhere in between
-              return Characteristic.LockCurrentState.UNKNOWN
+      if position == 'up'
+        return Characteristic.LockCurrentState.UNSECURED
+      else if position == "down"
+        return Characteristic.LockCurrentState.SECURED
+      else
+        # stopped somewhere in between
+        return Characteristic.LockCurrentState.UNKNOWN

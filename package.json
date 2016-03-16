@@ -5,6 +5,7 @@
   "main": "hap.coffee",
   "files": [
     "accessories",
+    "test",
     "hap.coffee",
     "README.md",
     "hap-config-schema.coffee",
@@ -18,9 +19,22 @@
     "url": "git://github.com/michbeck100/pimatic-hap.git"
   },
   "configSchema": "hap-config-schema.coffee",
+  "scripts": {
+    "test": "grunt test"
+  },
   "dependencies": {
     "hap-nodejs": "0.2.5",
     "color-convert": "1.0.0"
+  },
+  "devDependencies": {
+    "cassert": "0.1.2",
+    "grunt-cli": "0.1.11",
+    "grunt": "0.4.2",
+    "grunt-coffeelint": "0.0.8",
+    "grunt-mocha-test": "0.8.1",
+    "blanket": "1.1.5",
+    "coffee-errors": "0.8.4",
+    "mocha": "1.17.0"
   },
   "peerDependencies": {
     "pimatic": "0.8.*"

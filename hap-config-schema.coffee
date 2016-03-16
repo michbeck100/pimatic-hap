@@ -15,4 +15,4 @@ module.exports = {
       type: "integer"
       default: 51826
   }
-};
+}

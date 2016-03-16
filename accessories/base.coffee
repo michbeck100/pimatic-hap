@@ -23,7 +23,7 @@ module.exports = (env) ->
       @getService(Service.AccessoryInformation)
         .setCharacteristic(Characteristic.Manufacturer, "Pimatic")
         .setCharacteristic(Characteristic.Model, "Rev-1")
-        .setCharacteristic(Characteristic.SerialNumber, serialNumber);
+        .setCharacteristic(Characteristic.SerialNumber, serialNumber)
 
       @addService(Service.BridgingState)
         .getCharacteristic(Characteristic.Reachable)
@@ -69,6 +69,8 @@ module.exports = (env) ->
       return false
 
     getServiceOverride: (service) =>
-      if @hapConfig != null && @hapConfig != undefined && @hapConfig.service != null && @hapConfig.service != undefined && @hapConfig.service of @supportedServiceOverrides
+      if @hapConfig != null && @hapConfig != undefined &&
+      @hapConfig.service != null && @hapConfig.service != undefined &&
+      @hapConfig.service of @supportedServiceOverrides
         return @supportedServiceOverrides[@hapConfig.service]
       return service
