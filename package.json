@@ -28,7 +28,6 @@
   },
   "devDependencies": {
     "coffee-script": "1.8.0",
-    "cassert": "0.1.2",
     "grunt-cli": "0.1.11",
     "grunt": "0.4.2",
     "grunt-coffeelint": "0.0.8",
