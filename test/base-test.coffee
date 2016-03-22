@@ -4,9 +4,8 @@ grunt = require "grunt"
 describe "base", ->
 
   uuid = require ('hap-nodejs/lib/util/uuid')
-  env = require('pimatic/startup').env
 
-  BaseAccessory = require("../accessories/base")(env)
+  BaseAccessory = require("../accessories/base")(null)
 
   class TestDevice
     id: "test-id"

@@ -1,10 +1,9 @@
 grunt = require "grunt"
 assert = require "assert"
-env = require('pimatic/startup').env
 
 describe "powerswitch", ->
 
-  PowerSwitchAccessory = require("../accessories/powerswitch")(env)
+  PowerSwitchAccessory = require("../accessories/powerswitch")(null)
   hap = require 'hap-nodejs'
   Service = hap.Service
   Characteristic = hap.Characteristic
