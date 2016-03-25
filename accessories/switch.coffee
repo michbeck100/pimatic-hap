@@ -1,5 +1,9 @@
 module.exports = (env) ->
 
+  hap = require 'hap-nodejs'
+  Service = hap.Service
+  Characteristic = hap.Characteristic
+
   BaseAccessory = require('./base')(env)
 
   # base class for switch actuators
@@ -7,6 +11,26 @@ module.exports = (env) ->
 
     constructor: (device) ->
       super(device)
+
+      service = @getServiceOverride()
+
+      @addService(service, device.name)
+        .getCharacteristic(Characteristic.On)
+        .on 'set', (value, callback) =>
+          if value is device._state
+            callback()
+            return
+          promise = if value then device.turnOn() else device.turnOff()
+          @handleVoidPromise(promise, callback)
+
+      @getService(service)
+        .getCharacteristic(Characteristic.On)
+        .on 'get', (callback) =>
+          @handleReturnPromise(device.getState(), callback, null)
+
+      device.on 'state', (state) =>
+        @getService(service)
+          .setCharacteristic(Characteristic.On, state)
 
     # default identify method on switches turns the switch on and off two times
     identify: (device, paired, callback) =>

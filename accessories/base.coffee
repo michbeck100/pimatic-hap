@@ -68,9 +68,12 @@ module.exports = (env) ->
         return @hapConfig.exclude != null && @hapConfig.exclude
       return false
 
-    getServiceOverride: (service) =>
+    getServiceOverride: =>
       if @hapConfig != null && @hapConfig != undefined &&
       @hapConfig.service != null && @hapConfig.service != undefined &&
       @hapConfig.service of @supportedServiceOverrides
         return @supportedServiceOverrides[@hapConfig.service]
-      return service
+      return @getDefaultService()
+
+    getDefaultService: =>
+      throw new Error "getDefaultService must be overridden"

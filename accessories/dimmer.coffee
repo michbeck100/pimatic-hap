@@ -14,24 +14,6 @@ module.exports = (env) ->
     constructor: (device) ->
       super(device)
 
-      @addService(Service.Lightbulb, device.name)
-        .getCharacteristic(Characteristic.On)
-        .on 'set', (value, callback) =>
-          if device._state == value
-            callback()
-            return
-          promise = if value then device.turnOn() else device.turnOff()
-          @handleVoidPromise(promise, callback)
-
-      @getService(Service.Lightbulb)
-        .getCharacteristic(Characteristic.On)
-        .on 'get', (callback) =>
-          @handleReturnPromise(device.getState(), callback, null)
-
-      device.on 'state', (state) =>
-        @getService(Service.Lightbulb)
-          .setCharacteristic(Characteristic.On, state)
-
       @getService(Service.Lightbulb)
         .getCharacteristic(Characteristic.Brightness)
         .on 'get', (callback) =>
@@ -44,7 +26,10 @@ module.exports = (env) ->
       @getService(Service.Lightbulb)
         .getCharacteristic(Characteristic.Brightness)
         .on 'set', (value, callback) =>
-          if device._dimlevel == value
+          if device._dimlevel is value
             callback()
             return
           @handleVoidPromise(device.changeDimlevelTo(value), callback)
+
+    getDefaultService: =>
+      return Service.Lightbulb
