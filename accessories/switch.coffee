@@ -9,17 +9,22 @@ module.exports = (env) ->
   # base class for switch actuators
   class SwitchAccessory extends BaseAccessory
 
+    _state = null
+
     constructor: (device) ->
       super(device)
+      @_state = device._state
 
       service = @getServiceOverride()
-
       @addService(service, device.name)
         .getCharacteristic(Characteristic.On)
         .on 'set', (value, callback) =>
-          if value is device._state
+          if value is @_state
+            env.logger.debug 'value ' + value + ' equals current device state. Not switching.'
             callback()
             return
+          env.logger.debug 'switching device to ' + value
+          @_state = value
           promise = if value then device.turnOn() else device.turnOff()
           @handleVoidPromise(promise, callback)
 
