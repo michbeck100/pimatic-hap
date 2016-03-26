@@ -17,6 +17,8 @@ class TestSwitch extends require('events').EventEmitter
   config: {}
   _state: null
 
+  getState: -> Promise.resolve(@_state)
+
   turnOn: ->
     @_state = on
     return Promise.resolve()
@@ -24,6 +26,9 @@ class TestSwitch extends require('events').EventEmitter
   turnOff: ->
     @_state = off
     return Promise.resolve()
+
+  fireChange: ->
+    @emit 'state', on
 
 class TestAccessory extends SwitchAccessory
 
@@ -59,4 +64,24 @@ describe "switch", ->
       accessory.toggle(true)
       device._state = null
       accessory.toggle(true)
+      assert device._state is null
+
+    it "should return state when get event is fired", ->
+      assertState = (state) ->
+        accessory.toggle(state)
+        accessory.getService(Service.Switch)
+          .getCharacteristic(Characteristic.On)
+          .getValue((error, value) ->
+            assert error is null
+            assert value is state
+          )
+
+      assertState(true)
+      assertState(false)
+
+    it "should handle state event and set Characteristic.On", ->
+      device.fireChange()
+      assert device._state is on
+      device._state = null
+      device.fireChange()
       assert device._state is null
