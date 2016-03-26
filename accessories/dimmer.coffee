@@ -34,7 +34,7 @@ module.exports = (env) ->
             callback()
             return
           env.logger.debug 'changing dimlevel to ' + value
-          @_dimLevel = value
+          @_dimlevel = value
           @handleVoidPromise(device.changeDimlevelTo(value), callback)
 
     getDefaultService: =>
