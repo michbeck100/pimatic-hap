@@ -1,6 +1,9 @@
 [![Build Status](http://img.shields.io/travis/michbeck100/pimatic-hap/master.svg)](https://travis-ci.org/michbeck100/pimatic-hap)
 [![Version](https://img.shields.io/npm/v/pimatic-hap.svg)](https://img.shields.io/npm/v/pimatic-hap.svg)
+[![downloads][downloads-image]][downloads-url]
 
+[downloads-image]: https://img.shields.io/npm/dm/pimatic-hap.svg?style=flat
+[downloads-url]: https://npmjs.org/package/pimatic-hap
 
 pimatic-hap
 =======================
