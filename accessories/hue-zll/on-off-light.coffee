@@ -3,15 +3,15 @@ module.exports = (env) ->
   hap = require 'hap-nodejs'
   Service = hap.Service
 
-  SwitchAccessory = require('./switch')(env)
+  SwitchAccessory = require('../switch')(env)
 
   ##
-  # PowerSwitch
+  # HueZLLOnOffLight
   ##
-  class PowerSwitchAccessory extends SwitchAccessory
+  class HueOnOffLightAccessory extends SwitchAccessory
 
     constructor: (device) ->
       super(device)
 
     getDefaultService: ->
-      return Service.Switch
+      return Service.Lightbulb

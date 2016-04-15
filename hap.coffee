@@ -6,6 +6,8 @@ module.exports = (env) =>
   #import accessories
   ContactAccessory = require('./accessories/contact')(env)
   DimmerAccessory = require('./accessories/dimmer')(env)
+  HueDimmerAccessory = require('./accessories/hue-zll/dimmer')(env)
+  HueOnOffLightAccessory = require('./accessories/hue-zll/on-off-light')(env)
   LedLightAccessory = require('./accessories/ledlight')(env)
   MotionAccessory = require('./accessories/motion')(env)
   PowerSwitchAccessory = require('./accessories/powerswitch')(env)
@@ -34,6 +36,10 @@ module.exports = (env) =>
 
     knownDevices: {
       'dimmer': DimmerAccessory
+      'huezllonoff': HueOnOffLightAccessory
+      'huezlldimmable': HueDimmerAccessory
+      'huezllcolortemp': HueDimmerAccessory
+      'huezllcolor': HueDimmerAccessory
       'switch': PowerSwitchAccessory
       'shutter': ShutterAccessory
       'temperature': TemperatureAccessory
