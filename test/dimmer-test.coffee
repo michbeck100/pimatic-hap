@@ -47,7 +47,17 @@ describe "dimmer", ->
       assert device._dimlevel is 20
 
     it "should not change dimlevel again after setting to same value", ->
-      accessory.changeBrightness(20)
+      accessory.changeBrightness(5)
       device._dimlevel = null
-      accessory.changeBrightness(20)
+      accessory.changeBrightness(5)
       assert device._dimlevel is null
+
+    it "should set the state of switch to on when dimlevel > 0", ->
+      accessory._state = off
+      accessory.changeBrightness(10)
+      assert accessory._state is on
+
+    it "should set the state of switch to off when dimlevel = 0", ->
+      accessory._state = on
+      accessory.changeBrightness(0)
+      assert accessory._state is off
