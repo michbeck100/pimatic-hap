@@ -13,6 +13,27 @@ publishes all devices configured in pimatic as Homekit Accessories using a singl
 
 Currently it supports most devices that pimatic comes with OOB. Some device types cannot be supported because the HomeKit protocol doesn't have similar types.
 
+These devices currently are:
+* ContactSensor
+* DimmerActuator
+* PresenceSensor
+* PowerSwitch
+* ShutterController
+* TemperatureSensor
+* HeatingThermostat
+
+These are just base classes, that provide a certain interface, that pimatic-hap understands, but they contain no real logic. All "real" devices, that extend from these, are supported, like [HomeduinoRFSwitch](https://github.com/pimatic/pimatic-homeduino#switch-example). If you want to know if your device is supported, just check the source code of the pimatic plugin. If the device extends from any of the base classes like
+
+      class HomeduinoSwitch extends env.devices.PowerSwitch
+
+then this device is supported.
+
+
+Apart from the standard devices pimatic-hap supports also devices from third party plugins.
+Currently this applies just to the [pimatic-led-light](https://github.com/philip1986/pimatic-led-light) plugin, but there is more to come. If you are the developer of a pimatic plugin that defines a new device class, that fits into the HomeKit world, just create a [feature request](https://github.com/michbeck100/pimatic-hap/issues/new).
+
+#### Installation
+
 Since this plugin uses [HAP-NodeJS](https://github.com/KhaosT/HAP-NodeJS), libnss-mdns and libavahi-compat-libdnssd-dev must be installed on a raspberry pi:
 
     sudo apt-get install libnss-mdns libavahi-compat-libdnssd-dev
@@ -65,6 +86,14 @@ Do you like this plugin? Then consider a donation to support development.
 [![Flattr pimatic-hap](http://api.flattr.com/button/flattr-badge-large.png)](https://flattr.com/submit/auto?user_id=michbeck100&url=https://github.com/michbeck100/pimatic-hap&title=pimatic-hap&language=&tags=github&category=software)
 
 ### Changelog
+0.6.3
+* Added unit tests
+* [#29](https://github.com/michbeck100/pimatic-hap/issues/29) Make sure that only if state changed device gets toggled, remember current state of dimmer and switch in local variable, fixing infinite loop for dimmers
+* When setting dim level higher than zero switch state gets set to on. This triggered another event which set the dim level to 100.
+
+0.6.1
+* Fixed possible null value
+
 0.6.0
 * [#20](https://github.com/michbeck100/pimatic-hap/issues/20), [#23](https://github.com/michbeck100/pimatic-hap/issues/23) added config options to exclude devices from homekit and to override service. For now just power switches can be set to Lightbulb instead of Switch.
 * Updated hap-nodejs dependency to 0.2.5
