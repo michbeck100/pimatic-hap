@@ -23,7 +23,7 @@
     "test": "grunt test"
   },
   "dependencies": {
-    "hap-nodejs": "0.2.5",
+    "hap-nodejs": "0.3.2",
     "color-convert": "1.0.0"
   },
   "devDependencies": {
@@ -35,7 +35,8 @@
     "grunt-mocha-test": "0.8.1",
     "blanket": "1.1.5",
     "coffee-errors": "0.8.4",
-    "mocha": "1.17.0"
+    "mocha": "1.17.0",
+    "chai": "3.5.0"
   },
   "peerDependencies": {
     "pimatic": "0.8.*"
