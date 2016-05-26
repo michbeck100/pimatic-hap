@@ -86,6 +86,11 @@ Do you like this plugin? Then consider a donation to support development.
 [![Flattr pimatic-hap](http://api.flattr.com/button/flattr-badge-large.png)](https://flattr.com/submit/auto?user_id=michbeck100&url=https://github.com/michbeck100/pimatic-hap&title=pimatic-hap&language=&tags=github&category=software)
 
 ### Changelog
+0.6.4
+* [#21](https://github.com/michbeck100/pimatic-hap/issues/21) Implemented shutter with Service.GarageDoorOpener. This is more like a real shutter than Service.LockMechanism
+* Updated to hap-nodejs 0.3.2
+* Better debug logging for switches and dimmers
+
 0.6.3
 * Added unit tests
 * [#29](https://github.com/michbeck100/pimatic-hap/issues/29) Make sure that only if state changed device gets toggled, remember current state of dimmer and switch in local variable, fixing infinite loop for dimmers
