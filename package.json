@@ -11,7 +11,7 @@
     "hap-config-schema.coffee",
     "LICENSE"
   ],
-  "version": "0.6.1",
+  "version": "0.6.4",
   "homepage": "https://github.com/michbeck100/pimatic-hap",
   "private": false,
   "repository": {
@@ -23,7 +23,7 @@
     "test": "grunt test"
   },
   "dependencies": {
-    "hap-nodejs": "0.2.5",
+    "hap-nodejs": "0.3.2",
     "color-convert": "1.0.0"
   },
   "devDependencies": {
