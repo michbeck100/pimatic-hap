@@ -40,6 +40,7 @@ module.exports = (env) =>
       'huezlldimmable': HueDimmerAccessory
       'huezllcolortemp': HueDimmerAccessory
       'huezllcolor': HueDimmerAccessory
+      'huezllextendedcolor': HueDimmerAccessory
       'switch': PowerSwitchAccessory
       'shutter': ShutterAccessory
       'temperature': TemperatureAccessory
