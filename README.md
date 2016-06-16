@@ -13,7 +13,7 @@ publishes all devices configured in pimatic as Homekit Accessories using a singl
 
 Currently it supports most devices that pimatic comes with OOB. Some device types cannot be supported because the HomeKit protocol doesn't have similar types.
 
-These devices currently are:
+The supported devices currently are:
 * ContactSensor
 * DimmerActuator
 * PresenceSensor
