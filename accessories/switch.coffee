@@ -20,10 +20,11 @@ module.exports = (env) ->
         .getCharacteristic(Characteristic.On)
         .on 'set', (value, callback) =>
           if value is @_state
-            env.logger.debug 'value ' + value + ' equals current device state. Not switching.'
+            env.logger.debug 'value ' + value + ' equals current state of ' +
+              device.name + '. Not switching.'
             callback()
             return
-          env.logger.debug 'switching device to ' + value
+          env.logger.debug 'switching device ' + device.name + ' to ' + value
           @_state = value
           promise = if value then device.turnOn() else device.turnOff()
           @handleVoidPromise(promise, callback)
