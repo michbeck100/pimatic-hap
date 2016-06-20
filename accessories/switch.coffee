@@ -19,6 +19,9 @@ module.exports = (env) ->
       @addService(service, device.name)
         .getCharacteristic(Characteristic.On)
         .on 'set', (value, callback) =>
+          # HomeKit uses 0 or 1, must be converted to bool
+          if value is 1 then value = true
+          if value is 0 then value = false
           if value is @_state
             env.logger.debug 'value ' + value + ' equals current state of ' +
               device.name + '. Not switching.'

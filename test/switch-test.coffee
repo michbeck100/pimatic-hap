@@ -85,3 +85,19 @@ describe "switch", ->
       device._state = null
       device.fireChange()
       assert device._state is null
+
+    it "should handle setting value to 1", ->
+      accessory._state = true
+      accessory.toggle(1)
+      assert device._state is null
+      accessory._state = false
+      accessory.toggle(1)
+      assert device._state is true
+
+    it "should handle setting value to 0", ->
+      accessory._state = false
+      accessory.toggle(0)
+      assert device._state is null
+      accessory._state = true
+      accessory.toggle(0)
+      assert device._state is false
