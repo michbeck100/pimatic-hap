@@ -34,7 +34,7 @@ module.exports = (env) =>
 
   class HapPlugin extends env.plugins.Plugin
 
-    knownDevices: {
+    knownTemplates: {
       'dimmer': DimmerAccessory
       'huezllonoff': HueOnOffLightAccessory
       'huezlldimmable': HueDimmerAccessory
@@ -113,13 +113,13 @@ module.exports = (env) =>
 
     createAccessoryFromTemplate: (device) =>
       if @isKnownDevice(device)
-        return new @knownDevices[device.template](device)
+        return new @knownTemplates[device.template](device)
       else
         env.logger.debug("unsupported device type: " + device.constructor.name)
         return null
 
     isKnownDevice: (device) =>
-      return device.template of @knownDevices
+      return device.template of @knownTemplates
 
   plugin = new HapPlugin()
 

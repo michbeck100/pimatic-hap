@@ -14,15 +14,18 @@ module.exports = (env) ->
     constructor: (device) ->
       super(device)
 
-      @addService(Service.TemperatureSensor, device.name)
-        .getCharacteristic(Characteristic.CurrentTemperature)
-        .on 'get', (callback) =>
-          @handleReturnPromise(device.getTemperature(), callback, null)
-        .props.minValue = -50
+      if device.hasAttribute('temperature')
+        @addService(Service.TemperatureSensor, device.name)
+          .getCharacteristic(Characteristic.CurrentTemperature)
+          .on 'get', (callback) =>
+            @handleReturnPromise(device.getTemperature(), callback, null)
+          .props.minValue = -50
 
-      device.on 'temperature', (temperature) =>
-        @getService(Service.TemperatureSensor)
-          .setCharacteristic(Characteristic.CurrentTemperature, temperature)
+        device.on 'temperature', (temperature) =>
+          @getService(Service.TemperatureSensor)
+            .setCharacteristic(Characteristic.CurrentTemperature, temperature)
+
+        @addBatteryStatus(device, Service.TemperatureSensor)
 
       # some devices also measure humidity
       if device.hasAttribute('humidity')
@@ -34,3 +37,22 @@ module.exports = (env) ->
         device.on 'humidity', (humidity) =>
           @getService(Service.HumiditySensor)
             .setCharacteristic(Characteristic.CurrentRelativeHumidity, humidity)
+
+        @addBatteryStatus(device, Service.HumiditySensor)
+
+    addBatteryStatus: (device, service) =>
+      if device.hasAttribute('lowBattery')
+        @getService(service)
+          .getCharacteristic(Characteristic.StatusLowBattery)
+          .on 'get', (callback) =>
+            @handleReturnPromise(device.getLowBattery(), callback, @getBatteryStatus)
+
+        device.on 'lowBattery', (state) =>
+          @getService(service)
+            .setCharacteristic(Characteristic.StatusLowBattery, @getBatteryStatus(state))
+
+    getBatteryStatus: (state) =>
+      if state
+        return Characteristic.StatusLowBattery.BATTERY_LEVEL_LOW
+      else
+        return Characteristic.StatusLowBattery.BATTERY_LEVEL_NORMAL
