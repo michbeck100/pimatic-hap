@@ -3,7 +3,7 @@ module.exports = (env) ->
   hap = require 'hap-nodejs'
   Service = hap.Service
 
-  SwitchAccessory = require('../switch')(env)
+  SwitchAccessory = require('./switch')(env)
 
   ##
   # Lightbulb
