@@ -1,5 +1,5 @@
 grunt = require 'grunt'
-assert = require "assert"
+assert = require 'assert'
 Promise = require 'bluebird'
 
 env =
