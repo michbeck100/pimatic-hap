@@ -43,16 +43,17 @@ module.exports = (env) ->
 
     # default identify method on switches turns the switch on and off two times
     identify: (device, paired, callback) =>
+      delay = 500
       # make sure it's off, then turn on and off twice
       promise = device.getState()
         .then( (state) =>
           device.turnOff()
-          .then( => device.turnOn() )
-          .then( => device.turnOff() )
-          .then( => device.turnOn() )
+          .then( => device.turnOn().delay(delay) )
+          .then( => device.turnOff().delay(delay) )
+          .then( => device.turnOn().delay(delay) )
           .then( =>
             # recover initial state
-            device.turnOff() if not state
+            device.turnOff().delay(delay) if not state
           )
         )
       @handleVoidPromise(promise, callback)
