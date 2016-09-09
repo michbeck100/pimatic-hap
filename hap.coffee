@@ -6,8 +6,7 @@ module.exports = (env) =>
   #import accessories
   ContactAccessory = require('./accessories/contact')(env)
   DimmerAccessory = require('./accessories/dimmer')(env)
-  HueDimmerAccessory = require('./accessories/hue-zll/dimmer')(env)
-  HueOnOffLightAccessory = require('./accessories/hue-zll/on-off-light')(env)
+  LightbulbAccessory = require('./accessories/lightbulb')(env)
   LedLightAccessory = require('./accessories/ledlight')(env)
   MotionAccessory = require('./accessories/motion')(env)
   PowerSwitchAccessory = require('./accessories/powerswitch')(env)
@@ -36,11 +35,11 @@ module.exports = (env) =>
 
     knownTemplates: {
       'dimmer': DimmerAccessory
-      'huezllonoff': HueOnOffLightAccessory
-      'huezlldimmable': HueDimmerAccessory
-      'huezllcolortemp': HueDimmerAccessory
-      'huezllcolor': HueDimmerAccessory
-      'huezllextendedcolor': HueDimmerAccessory
+      'huezllonoff': LightbulbAccessory
+      'huezlldimmable': DimmerAccessory
+      'huezllcolortemp': DimmerAccessory
+      'huezllcolor': DimmerAccessory
+      'huezllextendedcolor': DimmerAccessory
       'switch': PowerSwitchAccessory
       'shutter': ShutterAccessory
       'temperature': TemperatureAccessory

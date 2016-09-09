@@ -6,9 +6,9 @@ module.exports = (env) ->
   SwitchAccessory = require('../switch')(env)
 
   ##
-  # HueZLLOnOffLight
+  # Lightbulb
   ##
-  class HueOnOffLightAccessory extends SwitchAccessory
+  class LightbulbAccessory extends SwitchAccessory
 
     constructor: (device) ->
       super(device)
