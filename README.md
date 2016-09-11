@@ -86,6 +86,12 @@ Do you like this plugin? Then consider a donation to support development.
 [![Flattr pimatic-hap](http://api.flattr.com/button/flattr-badge-large.png)](https://flattr.com/submit/auto?user_id=michbeck100&url=https://github.com/michbeck100/pimatic-hap&title=pimatic-hap&language=&tags=github&category=software)
 
 ### Changelog
+0.8.0
+* [#37](https://github.com/michbeck100/pimatic-hap/issues/37)  HomeKit uses 1 and 0 for Characteristic.On, must be converted to bool
+* Added Characteristic.StatusLowBattery to temperature and humidity sensor
+* removed special hue-zll classes and replaced by simplified versions
+* Added implementation for ButtonsDevice. Currently just the first button of a device is supported. Shows up as a normal switch for now, but resets its state after 250 ms.
+
 0.7.0
 * Implementation for Philips Hue Lights controlled by pimatic-hue-zll plugin. Currently just features of HueZLLOnOffLight and HueZLLDimmableLight are supported.
 
