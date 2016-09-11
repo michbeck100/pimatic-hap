@@ -4,6 +4,7 @@ process.env['DEBUG'] = 'HAPServer,Accessory,EventedHttpServer'
 module.exports = (env) =>
 
   #import accessories
+  ButtonAccessory = require('./accessories/button')(env)
   ContactAccessory = require('./accessories/contact')(env)
   DimmerAccessory = require('./accessories/dimmer')(env)
   LightbulbAccessory = require('./accessories/lightbulb')(env)
@@ -34,6 +35,7 @@ module.exports = (env) =>
   class HapPlugin extends env.plugins.Plugin
 
     knownTemplates: {
+      'buttons': ButtonAccessory
       'dimmer': DimmerAccessory
       'huezllonoff': LightbulbAccessory
       'huezlldimmable': DimmerAccessory
