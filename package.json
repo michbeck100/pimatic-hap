@@ -11,7 +11,7 @@
     "hap-config-schema.coffee",
     "LICENSE"
   ],
-  "version": "0.7.0",
+  "version": "0.8.0",
   "homepage": "https://github.com/michbeck100/pimatic-hap",
   "private": false,
   "repository": {
@@ -39,7 +39,7 @@
     "chai": "3.5.0"
   },
   "peerDependencies": {
-    "pimatic":  "~0.9.0"
+    "pimatic": "~0.9.0"
   },
   "engines": {
     "node": ">0.10.x",
