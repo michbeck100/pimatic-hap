@@ -14,6 +14,7 @@ publishes all devices configured in pimatic as Homekit Accessories using a singl
 Currently it supports most devices that pimatic comes with OOB. Some device types cannot be supported because the HomeKit protocol doesn't have similar types.
 
 The supported devices currently are:
+* ButtonsDevice (just the first defined button)
 * ContactSensor
 * DimmerActuator
 * PresenceSensor
@@ -30,7 +31,11 @@ then this device is supported.
 
 
 Apart from the standard devices pimatic-hap supports also devices from third party plugins.
-Currently this applies just to the [pimatic-led-light](https://github.com/philip1986/pimatic-led-light) plugin, but there is more to come. If you are the developer of a pimatic plugin that defines a new device class, that fits into the HomeKit world, just create a [feature request](https://github.com/michbeck100/pimatic-hap/issues/new).
+Currently this applies to
+* [pimatic-led-light](https://github.com/philip1986/pimatic-led-light) - A pimatic plugin for LED lights resp. LED-Stripes
+* [pimatic-hue-zll](https://github.com/markbergsma/pimatic-hue-zll) - Integration of Pimatic with (Zigbee Light Link based) Philips Hue networks, using the Philips Hue (bridge) API.
+
+If you are the developer of a pimatic plugin that defines a new device class, that fits into the HomeKit world, just create a [feature request](https://github.com/michbeck100/pimatic-hap/issues/new).
 
 #### Installation
 
@@ -72,7 +77,7 @@ Example:
 To exclude devices from being registered as Homekit Accessory, just set the "exclude" flag to true. By default all supported devices will be registered.
 
 For some devices it's possible to override the default Service (find the explanation of Services [here](https://github.com/KhaosT/HAP-NodeJS#api)).
-This is helpful if e.g. a lamp is connected to a pimatic-enabled outlet. Changing the Service to "Lightbulb" will make Homekit recognize the outlet as light, not as switch. This may also change the commands, that one can use with Siri.
+This is helpful if e.g. a lamp is connected to a pimatic-enabled outlet. Changing the Service to "Lightbulb" will make Homekit recognize the outlet as light, not as switch. This may also change the commands, that one can use with Siri. Currently just switches may act as a light. If you have suggestions for other possible overrides, that make sense, please create a [feature request](https://github.com/michbeck100/pimatic-hap/issues/new).
 
 Since the "hap" attribute doesn't belong to the device config schema, pimatic will issue a warning,
 that this is an unknown config entry. Maybe it will be officially possible to extend the configuration. Since then just ignore this warning.
