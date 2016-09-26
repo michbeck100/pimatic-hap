@@ -29,14 +29,17 @@ class TestShutter extends require('events').EventEmitter
 
   moveUp: ->
     @_position = "up"
+    @firePositionChange(@_position)
     return Promise.resolve()
 
   moveDown: ->
     @_position = "down"
+    @firePositionChange(@_position)
     return Promise.resolve()
 
   stop: ->
     @_position = "stopped"
+    @firePositionChange(@_position)
     return Promise.resolve()
 
 describe "shutter", ->
@@ -109,6 +112,18 @@ describe "shutter", ->
         .getCharacteristic(Characteristic.TargetDoorState)
         .setValue(Characteristic.TargetDoorState.OPEN)
       assert device._position is 'stopped'
+
+    it "should set Characteristic.CurrentDoorState", ->
+      getCurrentState = () =>
+        return accessory.getService(Service.GarageDoorOpener)
+          .getCharacteristic(Characteristic.CurrentDoorState)
+          .value
+      env.logger.debug 'getCurrentState = ' + getCurrentState()
+      assert getCurrentState() != Characteristic.CurrentDoorState.CLOSED
+      accessory.getService(Service.GarageDoorOpener)
+        .getCharacteristic(Characteristic.TargetDoorState)
+        .setValue(Characteristic.TargetDoorState.CLOSED)
+      assert getCurrentState() == Characteristic.CurrentDoorState.CLOSED
 
   describe "getCurrentState", ->
 
