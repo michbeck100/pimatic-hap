@@ -114,6 +114,8 @@ module.exports = (env) =>
 
     createAccessoryFromTemplate: (device) =>
       if @isKnownDevice(device)
+        # ButtonsDevice must not have more than one button
+        if device.template is "buttons" and device.config.buttons.length != 1 then return null
         return new @knownTemplates[device.template](device)
       else
         env.logger.debug("unsupported device type: " + device.constructor.name)
