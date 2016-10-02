@@ -13,24 +13,31 @@ module.exports = (env) ->
 
     constructor: (device) ->
       super(device)
-      @_state = device._state
 
       service = @getServiceOverride()
       @addService(service, device.name)
         .getCharacteristic(Characteristic.On)
         .on 'set', (value, callback) =>
-          # HomeKit uses 0 or 1, must be converted to bool
-          if value is 1 then value = true
-          if value is 0 then value = false
-          if value is @_state
-            env.logger.debug 'value ' + value + ' equals current state of ' +
-              device.name + '. Not switching.'
+          #check if state is already available for device
+          @_state = device._state
+          env.logger.debug "Current state of #{device.name} is: #{@_state}"
+          if @_state != null
+            if value is 1 then value = true
+            if value is 0 then value = false
+            if value is @_state
+              env.logger.debug 'value ' + value + ' equals current state of ' +
+                device.name + '. Not switching.'
+              callback()
+              return
+            env.logger.debug 'switching device ' + device.name + ' to ' + value
+            @_state = value
+            promise = if value then device.turnOn() else device.turnOff()
+            @handleVoidPromise(promise, callback)
+          else
+            #if we don't have a state yet we can not properly determine whether to switch or not
+            env.logger.debug "Device #{device.name} state not initialized yet, ignoring state change"
             callback()
             return
-          env.logger.debug 'switching device ' + device.name + ' to ' + value
-          @_state = value
-          promise = if value then device.turnOn() else device.turnOff()
-          @handleVoidPromise(promise, callback)
 
       @getService(service)
         .getCharacteristic(Characteristic.On)

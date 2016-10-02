@@ -4,3 +4,4 @@ doc/*
 *.iml
 .idea/*
 coverage.html
+.DS_STORE
