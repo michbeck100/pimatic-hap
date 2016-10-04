@@ -41,7 +41,8 @@ module.exports = (env) ->
             @handleVoidPromise(device.changeDimlevelTo(value), callback)
           else
             #if we don't have a dim level yet we can not properly determine whether to dim or not
-            env.logger.debug "Device #{device.name} dim level not initialized yet, ignoring dim level change"
+            env.logger.debug "Device #{device.name} dim level not initialized yet, 
+            ignoring dim level change"
             callback()
             return
 

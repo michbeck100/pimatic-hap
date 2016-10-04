@@ -35,7 +35,8 @@ module.exports = (env) ->
             @handleVoidPromise(promise, callback)
           else
             #if we don't have a state yet we can not properly determine whether to switch or not
-            env.logger.debug "Device #{device.name} state not initialized yet, ignoring state change"
+            env.logger.debug "Device #{device.name} state not initialized yet, 
+            ignoring state change"
             callback()
             return
 
