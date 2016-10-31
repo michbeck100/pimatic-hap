@@ -81,10 +81,7 @@ describe "switch", ->
 
     it "should handle state event and set Characteristic.On", ->
       device.fireChange()
-      assert device._state is on
-      device._state = null
-      device.fireChange()
-      assert device._state is null
+      assert accessory._state is on
 
     it "should handle setting value to 1", ->
       accessory._state = true

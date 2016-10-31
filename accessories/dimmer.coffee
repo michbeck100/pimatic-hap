@@ -23,6 +23,7 @@ module.exports = (env) ->
           @handleReturnPromise(device.getDimlevel(), callback, null)
 
       device.on 'dimlevel', (dimlevel) =>
+        @_dimlevel = dimlevel
         @getService(Service.Lightbulb)
           .setCharacteristic(Characteristic.Brightness, dimlevel)
 
