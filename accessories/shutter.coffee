@@ -24,6 +24,10 @@ module.exports = (env) ->
           @handleReturnPromise(device.getPosition(), callback, @getCurrentState)
 
       device.on 'position', (position) =>
+        if position is not 'stopped'
+          _targetState = @getTargetState(position)
+          @getService(Service.GarageDoorOpener)
+            .setCharacteristic(Characteristic.TargetDoorState, _targetState)
         @getService(Service.GarageDoorOpener)
           .setCharacteristic(Characteristic.CurrentDoorState, @getCurrentState(position))
 
@@ -31,19 +35,19 @@ module.exports = (env) ->
         .getCharacteristic(Characteristic.TargetDoorState)
         .on 'get', (callback) =>
           callback(null, @_targetState)
-
-      @getService(Service.GarageDoorOpener)
-        .getCharacteristic(Characteristic.TargetDoorState)
         .on 'set', (value, callback) =>
+          if value is @_targetState
+            env.logger.debug 'value ' + value + ' equals current position of ' +
+              device.name + '. Not changing.'
+            callback()
+            return
           promise = null
           if value == Characteristic.TargetDoorState.OPEN
             promise = device.moveUp()
           else if value == Characteristic.TargetDoorState.CLOSED
             promise = device.moveDown()
-          if @_targetState is value
-            promise = device.stop()
           @_targetState = value
-          if (promise != null)
+          if promise
             @handleVoidPromise(promise, callback)
           else
             callback()
@@ -54,6 +58,12 @@ module.exports = (env) ->
         when 'up' then Characteristic.CurrentDoorState.OPEN
         when 'down' then Characteristic.CurrentDoorState.CLOSED
         when 'stopped' then Characteristic.CurrentDoorState.STOPPED
+
+    getTargetState: (position) ->
+      assert position in ['up', 'down']
+      return switch position
+        when 'up' then Characteristic.TargetDoorState.OPEN
+        when 'down' then Characteristic.TargetDoorState.CLOSED
 
     getTargetPosition: (state) ->
       return switch state
