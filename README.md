@@ -91,6 +91,10 @@ Do you like this plugin? Then consider a donation to support development.
 [![Flattr pimatic-hap](http://api.flattr.com/button/flattr-badge-large.png)](https://flattr.com/submit/auto?user_id=michbeck100&url=https://github.com/michbeck100/pimatic-hap&title=pimatic-hap&language=&tags=github&category=software)
 
 ### Changelog
+
+0.8.1
+* setting internal state on device state change event and before setting characteristic. This should make switching more robust against infinite loops.
+
 0.8.0
 * [#37](https://github.com/michbeck100/pimatic-hap/issues/37)  HomeKit uses 1 and 0 for Characteristic.On, must be converted to bool
 * Added Characteristic.StatusLowBattery to temperature and humidity sensor
