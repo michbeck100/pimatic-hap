@@ -92,8 +92,13 @@ Do you like this plugin? Then consider a donation to support development.
 
 ### Changelog
 
+0.8.2
+* Reworked shutter implementation to report current state more reliable.
+* Moved identify code from switch to lightbulb.
+* Just ButtonsDevice with 1 button is supported for now 
+
 0.8.1
-* setting internal state on device state change event and before setting characteristic. This should make switching more robust against infinite loops.
+* Setting internal state on device state change event and before setting characteristic. This should make switching more robust against infinite loops.
 
 0.8.0
 * [#37](https://github.com/michbeck100/pimatic-hap/issues/37)  HomeKit uses 1 and 0 for Characteristic.On, must be converted to bool
