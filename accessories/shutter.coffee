@@ -24,17 +24,17 @@ module.exports = (env) ->
           @handleReturnPromise(device.getPosition(), callback, @getCurrentState)
 
       device.on 'position', (position) =>
-        if position is not 'stopped'
-          _targetState = @getTargetState(position)
+        if position != 'stopped'
+          @_targetState = @getTargetState(position)
           @getService(Service.GarageDoorOpener)
-            .setCharacteristic(Characteristic.TargetDoorState, _targetState)
+            .setCharacteristic(Characteristic.TargetDoorState, @_targetState)
         @getService(Service.GarageDoorOpener)
           .setCharacteristic(Characteristic.CurrentDoorState, @getCurrentState(position))
 
       @getService(Service.GarageDoorOpener)
         .getCharacteristic(Characteristic.TargetDoorState)
-        .on 'get', (callback) =>
-          callback(null, @_targetState)
+        .on 'get', ((callback) =>
+          callback(null, @_targetState))
         .on 'set', (value, callback) =>
           if value is @_targetState
             env.logger.debug 'value ' + value + ' equals current position of ' +
