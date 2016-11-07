@@ -12,13 +12,11 @@ module.exports = (env) ->
   class MotionAccessory extends BaseAccessory
 
     constructor: (device) ->
-      super(device)
+      super(device, Service.MotionSensor)
 
-      @addService(Service.MotionSensor, device.name)
-        .getCharacteristic(Characteristic.MotionDetected)
+      @service.getCharacteristic(Characteristic.MotionDetected)
         .on 'get', (callback) =>
           @handleReturnPromise(device.getPresence(), callback, null)
 
       device.on 'presence', (motionDetected) =>
-        @getService(Service.MotionSensor)
-          .setCharacteristic(Characteristic.MotionDetected, motionDetected)
+        @service.setCharacteristic(Characteristic.MotionDetected, motionDetected)

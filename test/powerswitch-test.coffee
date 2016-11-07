@@ -1,9 +1,14 @@
 grunt = require "grunt"
 assert = require "assert"
 
+env =
+  logger:
+    debug: (stmt) ->
+      grunt.log.writeln stmt
+
 describe "powerswitch", ->
 
-  PowerSwitchAccessory = require("../accessories/powerswitch")(null)
+  PowerSwitchAccessory = require("../accessories/powerswitch")(env)
   hap = require 'hap-nodejs'
   Service = hap.Service
   Characteristic = hap.Characteristic
@@ -22,7 +27,7 @@ describe "powerswitch", ->
       device = new TestSwitch()
       powerswitch = new PowerSwitchAccessory(device)
       actual = powerswitch.getService(Service.Switch)
-      assert actual.UUID == Service.Switch.UUID
+      assert actual
 
     it "should override Service from config", ->
       device = new TestSwitch()
@@ -31,4 +36,13 @@ describe "powerswitch", ->
           service: "Lightbulb"
       powerswitch = new PowerSwitchAccessory(device)
       actual = powerswitch.getService(Service.Lightbulb)
-      assert actual.UUID == Service.Lightbulb.UUID
+      assert actual
+
+    it "should ignore unsupported Service from config", ->
+      device = new TestSwitch()
+      device.config =
+        hap:
+          service: "foo"
+      powerswitch = new PowerSwitchAccessory(device)
+      actual = powerswitch.getService(Service.Switch)
+      assert actual

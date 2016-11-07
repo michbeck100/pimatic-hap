@@ -12,18 +12,16 @@ module.exports = (env) ->
   class TemperatureAccessory extends BaseAccessory
 
     constructor: (device) ->
-      super(device)
+      super(device, Service.TemperatureSensor)
 
       if device.hasAttribute('temperature')
-        @addService(Service.TemperatureSensor, device.name)
-          .getCharacteristic(Characteristic.CurrentTemperature)
+        @service.getCharacteristic(Characteristic.CurrentTemperature)
           .on 'get', (callback) =>
             @handleReturnPromise(device.getTemperature(), callback, null)
           .props.minValue = -50
 
         device.on 'temperature', (temperature) =>
-          @getService(Service.TemperatureSensor)
-            .setCharacteristic(Characteristic.CurrentTemperature, temperature)
+          @service.setCharacteristic(Characteristic.CurrentTemperature, temperature)
 
         @addBatteryStatus(device, Service.TemperatureSensor)
 

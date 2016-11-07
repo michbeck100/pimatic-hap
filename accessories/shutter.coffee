@@ -16,9 +16,9 @@ module.exports = (env) ->
     _targetState: null
 
     constructor: (device) ->
-      super(device)
+      super(device, Service.GarageDoorOpener)
 
-      @addService(Service.GarageDoorOpener, device.name)
+      @service
         .getCharacteristic(Characteristic.CurrentDoorState)
         .on 'get', (callback) =>
           @handleReturnPromise(device.getPosition(), callback, @getCurrentState)
@@ -26,13 +26,10 @@ module.exports = (env) ->
       device.on 'position', (position) =>
         if position != 'stopped'
           @_targetState = @getTargetState(position)
-          @getService(Service.GarageDoorOpener)
-            .setCharacteristic(Characteristic.TargetDoorState, @_targetState)
-        @getService(Service.GarageDoorOpener)
-          .setCharacteristic(Characteristic.CurrentDoorState, @getCurrentState(position))
+          @service.setCharacteristic(Characteristic.TargetDoorState, @_targetState)
+        @service.setCharacteristic(Characteristic.CurrentDoorState, @getCurrentState(position))
 
-      @getService(Service.GarageDoorOpener)
-        .getCharacteristic(Characteristic.TargetDoorState)
+      @service.getCharacteristic(Characteristic.TargetDoorState)
         .on 'get', ((callback) =>
           callback(null, @_targetState))
         .on 'set', (value, callback) =>

@@ -12,15 +12,15 @@ module.exports = (env) ->
   class ContactAccessory extends BaseAccessory
 
     constructor: (device) ->
-      super(device)
+      super(device, Service.ContactSensor)
 
-      @addService(Service.ContactSensor, device.name)
+      @service
         .getCharacteristic(Characteristic.ContactSensorState)
         .on 'get', (callback) =>
           @handleReturnPromise(device.getContact(), callback, @getContactSensorState)
 
       device.on 'contact', (state) =>
-        @getService(Service.ContactSensor)
+        @service
           .setCharacteristic(Characteristic.ContactSensorState, @getContactSensorState(state))
 
     getContactSensorState: (state) =>

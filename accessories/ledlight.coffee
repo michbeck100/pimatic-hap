@@ -14,14 +14,13 @@ module.exports = (env) ->
     _color: null
 
     constructor: (device) ->
-      super(device)
+      super(device, Service.Lightbulb)
 
       device.getColor().then( (rgb) =>
         @_color = convert.rgb.hsv(if rgb == '' then [255, 255, 255] else rgb)
       )
 
-      @addService(Service.Lightbulb, device.name)
-        .getCharacteristic(Characteristic.On)
+      @service.getCharacteristic(Characteristic.On)
         .on 'set', (value, callback) =>
           if device.getState().power == value
             ## nothing changed
@@ -32,37 +31,30 @@ module.exports = (env) ->
           else
             @handleVoidPromise(device.turnOff(), callback)
 
-      @getService(Service.Lightbulb)
-        .getCharacteristic(Characteristic.On)
+      @service.getCharacteristic(Characteristic.On)
         .on 'get', (callback) =>
           @handleReturnPromise(device.getPower(), callback, null)
 
       device.on 'power', (state) =>
-        @getService(Service.Lightbulb)
-          .setCharacteristic(Characteristic.On, state == 'on')
+        @service.setCharacteristic(Characteristic.On, state == 'on')
 
-      @getService(Service.Lightbulb)
-        .getCharacteristic(Characteristic.Brightness)
+      @service.getCharacteristic(Characteristic.Brightness)
         .on 'get', (callback) =>
           @handleReturnPromise(device.getBrightness(), callback, null)
 
-      @getService(Service.Lightbulb)
-        .getCharacteristic(Characteristic.Brightness)
+      @service.getCharacteristic(Characteristic.Brightness)
         .on 'set', (value, callback) =>
           @_color[2] = value
           @handleVoidPromise(device.setBrightness(value), callback)
 
       device.on 'brightness', (brightness) =>
-        @getService(Service.Lightbulb)
-          .setCharacteristic(Characteristic.Brightness, brightness)
+        @service.setCharacteristic(Characteristic.Brightness, brightness)
 
-      @getService(Service.Lightbulb)
-        .getCharacteristic(Characteristic.Hue)
+      @service.getCharacteristic(Characteristic.Hue)
         .on 'get', (callback) =>
           callback(null, @getHue())
 
-      @getService(Service.Lightbulb)
-        .getCharacteristic(Characteristic.Hue)
+      @service.getCharacteristic(Characteristic.Hue)
         .on 'set', (value, callback) =>
           if value == @getHue()
             callback()
@@ -73,18 +65,16 @@ module.exports = (env) ->
 
       device.on 'color', (hexColor) =>
         @_color = convert.hex.hsv(if hexColor == '' then '#FFFFFF' else hexColor)
-        @getService(Service.Lightbulb)
+        @service
           .setCharacteristic(Characteristic.Hue, @getHue())
           .setCharacteristic(Characteristic.Saturation, @getSaturation())
           .setCharacteristic(Characteristic.Brightness, @getBrightness())
 
-      @getService(Service.Lightbulb)
-        .getCharacteristic(Characteristic.Saturation)
+      @service.getCharacteristic(Characteristic.Saturation)
         .on 'get', (callback) =>
           callback(null, @getSaturation())
 
-      @getService(Service.Lightbulb)
-        .getCharacteristic(Characteristic.Saturation)
+      @service.getCharacteristic(Characteristic.Saturation)
         .on 'set', (value, callback) =>
           if value == @getSaturation()
             callback()
