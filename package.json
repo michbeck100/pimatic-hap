@@ -23,7 +23,7 @@
     "test": "grunt test"
   },
   "dependencies": {
-    "hap-nodejs": "0.3.2",
+    "hap-nodejs": "0.4.13",
     "color-convert": "1.0.0"
   },
   "devDependencies": {

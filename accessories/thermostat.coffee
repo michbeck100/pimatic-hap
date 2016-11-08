@@ -46,7 +46,7 @@ module.exports = (env) ->
           callback()
 
       device.on 'temperatureSetpoint', (target) =>
-        @service.setCharacteristic(Characteristic.TargetTemperature, target)
+        @service.updateCharacteristic(Characteristic.TargetTemperature, target)
 
       @service.getCharacteristic(Characteristic.CurrentHeatingCoolingState)
         .on 'get', (callback) =>
@@ -70,10 +70,10 @@ module.exports = (env) ->
 
       device.on 'mode', (mode) =>
         if mode == "auto"
-          @service.setCharacteristic(Characteristic.TargetHeatingCoolingState,
+          @service.updateCharacteristic(Characteristic.TargetHeatingCoolingState,
             Characteristic.TargetHeatingCoolingState.AUTO)
 
     setTemperatureTo: (temp) =>
       if @_temperature is temp then return
       @_temperature = temp
-      @service.setCharacteristic(Characteristic.CurrentTemperature, temp)
+      @service.updateCharacteristic(Characteristic.CurrentTemperature, temp)

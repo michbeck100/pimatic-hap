@@ -58,12 +58,13 @@ describe 'TemperatureAccessory', ->
           assert value is 50
         )
 
-    it "should set Characteristic.CurrentTemperature when temperature changes", ->
+    it "should update Characteristic.CurrentTemperature when temperature changes", ->
       valueSet = false
       accessory.getService(Service.TemperatureSensor)
         .getCharacteristic(Characteristic.CurrentTemperature)
-        .on 'set', (value) =>
-          assert value is 30
+        .on 'change', (values) =>
+          assert values.oldValue is 0
+          assert values.newValue is 30
           valueSet = true
       device.fire()
       assert valueSet
@@ -78,12 +79,13 @@ describe 'TemperatureAccessory', ->
           assert value is 20
         )
 
-    it "should set Characteristic.CurrentRelativeHumidity when humidity changes", ->
+    it "should update Characteristic.CurrentRelativeHumidity when humidity changes", ->
       valueSet = false
       accessory.getService(Service.HumiditySensor)
         .getCharacteristic(Characteristic.CurrentRelativeHumidity)
-        .on 'set', (value) =>
-          assert value is 40
+        .on 'change', (values) =>
+          assert values.oldValue is 0
+          assert values.newValue is 40
           valueSet = true
       device.fire()
       assert valueSet
@@ -107,8 +109,8 @@ describe 'TemperatureAccessory', ->
       valueSet = false
       accessory.getService(Service.HumiditySensor)
         .getCharacteristic(Characteristic.StatusLowBattery)
-        .on 'set', (value) =>
-          assert value is Characteristic.StatusLowBattery.BATTERY_LEVEL_LOW
+        .on 'change', (values) =>
+          assert values.newValue is Characteristic.StatusLowBattery.BATTERY_LEVEL_LOW
           valueSet = true
       device.fire()
       assert valueSet

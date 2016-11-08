@@ -40,4 +40,4 @@ module.exports = (env) ->
 
       device.on 'state', (state) =>
         @_state = state
-        @service.setCharacteristic(Characteristic.On, state)
+        @service.updateCharacteristic(Characteristic.On, state)

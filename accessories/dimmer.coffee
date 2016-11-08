@@ -24,7 +24,7 @@ module.exports = (env) ->
 
       device.on 'dimlevel', (dimlevel) =>
         @_dimlevel = dimlevel
-        @service.setCharacteristic(Characteristic.Brightness, dimlevel)
+        @service.updateCharacteristic(Characteristic.Brightness, dimlevel)
 
       @service.getCharacteristic(Characteristic.Brightness)
         .on 'set', (value, callback) =>

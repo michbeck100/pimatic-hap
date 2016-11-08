@@ -23,7 +23,7 @@ module.exports = (env) ->
 
         device.on 'temperature', (temperature) =>
           @getService(Service.TemperatureSensor)
-            .setCharacteristic(Characteristic.CurrentTemperature, temperature)
+            .updateCharacteristic(Characteristic.CurrentTemperature, temperature)
 
         @addBatteryStatus(device, @getService(Service.TemperatureSensor))
 
@@ -37,7 +37,7 @@ module.exports = (env) ->
 
         device.on 'humidity', (humidity) =>
           @getService(Service.HumiditySensor)
-            .setCharacteristic(Characteristic.CurrentRelativeHumidity, humidity)
+            .updateCharacteristic(Characteristic.CurrentRelativeHumidity, humidity)
 
         @addBatteryStatus(device, @getService(Service.HumiditySensor))
 
@@ -50,7 +50,7 @@ module.exports = (env) ->
 
         device.on 'lowBattery', (state) =>
           service
-            .setCharacteristic(Characteristic.StatusLowBattery, @getBatteryStatus(state))
+            .updateCharacteristic(Characteristic.StatusLowBattery, @getBatteryStatus(state))
 
     getBatteryStatus: (state) =>
       if state

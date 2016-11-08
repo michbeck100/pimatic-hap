@@ -19,4 +19,4 @@ module.exports = (env) ->
           @handleReturnPromise(device.getPresence(), callback, null)
 
       device.on 'presence', (motionDetected) =>
-        @service.setCharacteristic(Characteristic.MotionDetected, motionDetected)
+        @service.updateCharacteristic(Characteristic.MotionDetected, motionDetected)

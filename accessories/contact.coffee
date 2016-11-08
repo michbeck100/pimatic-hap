@@ -21,7 +21,7 @@ module.exports = (env) ->
 
       device.on 'contact', (state) =>
         @service
-          .setCharacteristic(Characteristic.ContactSensorState, @getContactSensorState(state))
+          .updateCharacteristic(Characteristic.ContactSensorState, @getContactSensorState(state))
 
     getContactSensorState: (state) =>
       if state

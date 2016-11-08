@@ -14,7 +14,7 @@ module.exports = (env) ->
       button = device.config.buttons[0]
 
       reset = () =>
-        @service.setCharacteristic(Characteristic.On, 0)
+        @service.updateCharacteristic(Characteristic.On, 0)
 
       @service.getCharacteristic(Characteristic.On)
         .on 'set', (value, callback) =>

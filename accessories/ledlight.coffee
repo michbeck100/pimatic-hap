@@ -36,7 +36,7 @@ module.exports = (env) ->
           @handleReturnPromise(device.getPower(), callback, null)
 
       device.on 'power', (state) =>
-        @service.setCharacteristic(Characteristic.On, state == 'on')
+        @service.updateCharacteristic(Characteristic.On, state == 'on')
 
       @service.getCharacteristic(Characteristic.Brightness)
         .on 'get', (callback) =>
@@ -48,7 +48,7 @@ module.exports = (env) ->
           @handleVoidPromise(device.setBrightness(value), callback)
 
       device.on 'brightness', (brightness) =>
-        @service.setCharacteristic(Characteristic.Brightness, brightness)
+        @service.updateCharacteristic(Characteristic.Brightness, brightness)
 
       @service.getCharacteristic(Characteristic.Hue)
         .on 'get', (callback) =>
@@ -66,9 +66,9 @@ module.exports = (env) ->
       device.on 'color', (hexColor) =>
         @_color = convert.hex.hsv(if hexColor == '' then '#FFFFFF' else hexColor)
         @service
-          .setCharacteristic(Characteristic.Hue, @getHue())
-          .setCharacteristic(Characteristic.Saturation, @getSaturation())
-          .setCharacteristic(Characteristic.Brightness, @getBrightness())
+          .updateCharacteristic(Characteristic.Hue, @getHue())
+          .updateCharacteristic(Characteristic.Saturation, @getSaturation())
+          .updateCharacteristic(Characteristic.Brightness, @getBrightness())
 
       @service.getCharacteristic(Characteristic.Saturation)
         .on 'get', (callback) =>

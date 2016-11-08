@@ -26,8 +26,8 @@ module.exports = (env) ->
       device.on 'position', (position) =>
         if position != 'stopped'
           @_targetState = @getTargetState(position)
-          @service.setCharacteristic(Characteristic.TargetDoorState, @_targetState)
-        @service.setCharacteristic(Characteristic.CurrentDoorState, @getCurrentState(position))
+          @service.updateCharacteristic(Characteristic.TargetDoorState, @_targetState)
+        @service.updateCharacteristic(Characteristic.CurrentDoorState, @getCurrentState(position))
 
       @service.getCharacteristic(Characteristic.TargetDoorState)
         .on 'get', ((callback) =>
