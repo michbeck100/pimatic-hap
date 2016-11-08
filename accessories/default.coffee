@@ -13,6 +13,10 @@ module.exports = (env) ->
       super(device)
       service = @getServiceOverride(device.config?.hap) unless service
       @service = @addService(service, device.name)
+      device.on 'remove', () =>
+        env.logger.debug 'removing device ' + device.name
+        @removeService(@service)
+
 
     getServiceOverride: (hapConfig) =>
       if hapConfig?.service of @supportedServiceOverrides
