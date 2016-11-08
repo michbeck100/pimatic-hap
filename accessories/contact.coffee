@@ -4,12 +4,12 @@ module.exports = (env) ->
   Service = hap.Service
   Characteristic = hap.Characteristic
 
-  BaseAccessory = require('./base')(env)
+  DefaultAccessory = require('./default')(env)
 
   ##
   # ContactSensor
   ##
-  class ContactAccessory extends BaseAccessory
+  class ContactAccessory extends DefaultAccessory
 
     constructor: (device) ->
       super(device, Service.ContactSensor)

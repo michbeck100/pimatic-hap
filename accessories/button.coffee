@@ -4,9 +4,9 @@ module.exports = (env) ->
   Service = hap.Service
   Characteristic = hap.Characteristic
 
-  BaseAccessory = require('./base')(env)
+  DefaultAccessory = require('./default')(env)
 
-  class ButtonAccessory extends BaseAccessory
+  class ButtonAccessory extends DefaultAccessory
 
     constructor: (device) ->
       super(device, Service.Switch)

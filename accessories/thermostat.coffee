@@ -4,12 +4,12 @@ module.exports = (env) ->
   Service = hap.Service
   Characteristic = hap.Characteristic
 
-  BaseAccessory = require('./base')(env)
+  DefaultAccessory = require('./default')(env)
 
   ##
   # HeatingThermostat
   ##
-  class ThermostatAccessory extends BaseAccessory
+  class ThermostatAccessory extends DefaultAccessory
 
     _temperature: null
 

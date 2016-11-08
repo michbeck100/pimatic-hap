@@ -6,9 +6,9 @@ module.exports = (env) ->
   Service = hap.Service
   Characteristic = hap.Characteristic
 
-  BaseAccessory = require('./base')(env)
+  DefaultAccessory = require('./default')(env)
 
-  class LedLightAccessory extends BaseAccessory
+  class LedLightAccessory extends DefaultAccessory
 
     # hsv value of current color
     _color: null

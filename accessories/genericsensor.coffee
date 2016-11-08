@@ -9,25 +9,28 @@ module.exports = (env) ->
   ##
   # TemperatureSensor
   ##
-  class TemperatureAccessory extends BaseAccessory
+  class GenericAccessory extends BaseAccessory
 
     constructor: (device) ->
-      super(device, Service.TemperatureSensor)
+      super(device)
 
       if device.hasAttribute('temperature')
-        @service.getCharacteristic(Characteristic.CurrentTemperature)
+        @addService(Service.TemperatureSensor, device.name)
+          .getCharacteristic(Characteristic.CurrentTemperature)
           .on 'get', (callback) =>
             @handleReturnPromise(device.getTemperature(), callback, null)
           .props.minValue = -50
 
         device.on 'temperature', (temperature) =>
-          @service.setCharacteristic(Characteristic.CurrentTemperature, temperature)
+          @getService(Service.TemperatureSensor)
+            .setCharacteristic(Characteristic.CurrentTemperature, temperature)
 
-        @addBatteryStatus(device, Service.TemperatureSensor)
+        @addBatteryStatus(device, @getService(Service.TemperatureSensor))
 
       # some devices also measure humidity
       if device.hasAttribute('humidity')
         @addService(Service.HumiditySensor, device.name)
+        @getService(Service.HumiditySensor)
           .getCharacteristic(Characteristic.CurrentRelativeHumidity)
           .on 'get', (callback) =>
             @handleReturnPromise(device.getHumidity(), callback, null)
@@ -36,17 +39,17 @@ module.exports = (env) ->
           @getService(Service.HumiditySensor)
             .setCharacteristic(Characteristic.CurrentRelativeHumidity, humidity)
 
-        @addBatteryStatus(device, Service.HumiditySensor)
+        @addBatteryStatus(device, @getService(Service.HumiditySensor))
 
     addBatteryStatus: (device, service) =>
       if device.hasAttribute('lowBattery')
-        @getService(service)
+        service
           .getCharacteristic(Characteristic.StatusLowBattery)
           .on 'get', (callback) =>
             @handleReturnPromise(device.getLowBattery(), callback, @getBatteryStatus)
 
         device.on 'lowBattery', (state) =>
-          @getService(service)
+          service
             .setCharacteristic(Characteristic.StatusLowBattery, @getBatteryStatus(state))
 
     getBatteryStatus: (state) =>

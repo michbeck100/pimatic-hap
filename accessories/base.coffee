@@ -9,12 +9,10 @@ module.exports = (env) ->
   # base class for all homekit accessories in pimatic
   class BaseAccessory extends Accessory
 
-    supportedServiceOverrides: {}
+    hapConfig: null
 
-    service: null
-
-    constructor: (device, service) ->
-      service = @getServiceOverride(device.config?.hap) unless service
+    constructor: (device) ->
+      @hapConfig = device.config.hap
       serialNumber = uuid.generate('pimatic-hap:accessories:' + device.id)
       super(device.name, serialNumber)
 
@@ -31,8 +29,6 @@ module.exports = (env) ->
 
       @on 'identify', (paired, callback) =>
         @identify(device, paired, callback)
-
-      @service = @addService(service, device.name)
 
     ## default identify method just calls callback
     identify: (device, paired, callback) =>
@@ -67,12 +63,3 @@ module.exports = (env) ->
       if @hapConfig != null && @hapConfig != undefined
         return @hapConfig.exclude != null && @hapConfig.exclude
       return false
-
-    getServiceOverride: (hapConfig) =>
-      if hapConfig?.service of @supportedServiceOverrides
-        return @supportedServiceOverrides[hapConfig.service]
-      else
-        return @getDefaultService()
-
-    getDefaultService: =>
-      throw new Error "getDefaultService must be overridden"

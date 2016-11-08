@@ -4,10 +4,10 @@ module.exports = (env) ->
   Service = hap.Service
   Characteristic = hap.Characteristic
 
-  BaseAccessory = require('./base')(env)
+  DefaultAccessory = require('./default')(env)
 
   # base class for switch actuators
-  class SwitchAccessory extends BaseAccessory
+  class SwitchAccessory extends DefaultAccessory
 
     _state = null
 

@@ -5,14 +5,14 @@ module.exports = (env) ->
   Service = hap.Service
   Characteristic = hap.Characteristic
 
-  BaseAccessory = require('./base')(env)
+  DefaultAccessory = require('./default')(env)
 
   ##
   # ShutterController
   #
   # currently shutter is using Service.GarageDoorOpener because Service.Window uses percentages
   # for moving the shutter which is not supported by ShutterController devices
-  class ShutterAccessory extends BaseAccessory
+  class ShutterAccessory extends DefaultAccessory
     _targetState: null
 
     constructor: (device) ->
