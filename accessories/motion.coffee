@@ -4,21 +4,19 @@ module.exports = (env) ->
   Service = hap.Service
   Characteristic = hap.Characteristic
 
-  BaseAccessory = require('./base')(env)
+  DefaultAccessory = require('./default')(env)
 
   ##
   # PresenceSensor
   ##
-  class MotionAccessory extends BaseAccessory
+  class MotionAccessory extends DefaultAccessory
 
     constructor: (device) ->
-      super(device)
+      super(device, Service.MotionSensor)
 
-      @addService(Service.MotionSensor, device.name)
-        .getCharacteristic(Characteristic.MotionDetected)
+      @service.getCharacteristic(Characteristic.MotionDetected)
         .on 'get', (callback) =>
           @handleReturnPromise(device.getPresence(), callback, null)
 
       device.on 'presence', (motionDetected) =>
-        @getService(Service.MotionSensor)
-          .setCharacteristic(Characteristic.MotionDetected, motionDetected)
+        @service.updateCharacteristic(Characteristic.MotionDetected, motionDetected)

@@ -9,10 +9,6 @@ module.exports = (env) ->
   # base class for all homekit accessories in pimatic
   class BaseAccessory extends Accessory
 
-    supportedServiceOverrides: {
-      "Lightbulb": Service.Lightbulb
-    }
-
     hapConfig: null
 
     constructor: (device) ->
@@ -67,13 +63,3 @@ module.exports = (env) ->
       if @hapConfig != null && @hapConfig != undefined
         return @hapConfig.exclude != null && @hapConfig.exclude
       return false
-
-    getServiceOverride: =>
-      if @hapConfig != null && @hapConfig != undefined &&
-      @hapConfig.service != null && @hapConfig.service != undefined &&
-      @hapConfig.service of @supportedServiceOverrides
-        return @supportedServiceOverrides[@hapConfig.service]
-      return @getDefaultService()
-
-    getDefaultService: =>
-      throw new Error "getDefaultService must be overridden"

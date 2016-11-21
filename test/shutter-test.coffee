@@ -50,7 +50,7 @@ describe "shutter", ->
 
   describe "getting Characteristic.CurrentDoorState", ->
 
-    it "should return CLOSED when postion is down", ->
+    it "should return CLOSED when position is down", ->
       device._position = 'down'
       accessory.getService(Service.GarageDoorOpener)
         .getCharacteristic(Characteristic.CurrentDoorState)
@@ -58,8 +58,16 @@ describe "shutter", ->
           assert error is null
           assert value is Characteristic.CurrentDoorState.CLOSED
         )
+    it "should return OPEN when position is up", ->
+      device._position = 'up'
+      accessory.getService(Service.GarageDoorOpener)
+        .getCharacteristic(Characteristic.CurrentDoorState)
+        .getValue((error, value) ->
+          assert error is null
+          assert value is Characteristic.CurrentDoorState.OPEN
+        )
 
-    it "should return STOPPED when postion is stopped", ->
+    it "should return STOPPED when position is stopped", ->
       device._position = 'stopped'
       accessory.getService(Service.GarageDoorOpener)
         .getCharacteristic(Characteristic.CurrentDoorState)
@@ -93,15 +101,18 @@ describe "shutter", ->
         .setValue(Characteristic.TargetDoorState.CLOSED)
       assert device._position is 'down'
 
-    it "should call stop() when set to OPEN twice", ->
+    it "should do nothing when set to OPEN twice", ->
+      count = 0
+      device.moveUp = () =>
+        count++
       accessory.getService(Service.GarageDoorOpener)
         .getCharacteristic(Characteristic.TargetDoorState)
         .setValue(Characteristic.TargetDoorState.OPEN)
       accessory.getService(Service.GarageDoorOpener)
         .getCharacteristic(Characteristic.TargetDoorState)
         .setValue(Characteristic.TargetDoorState.OPEN)
-      assert device._position is 'stopped'
-
+      assert count is 1
+      
   describe "getCurrentState", ->
 
     it "should return correct value", ->

@@ -14,6 +14,7 @@ publishes all devices configured in pimatic as Homekit Accessories using a singl
 Currently it supports most devices that pimatic comes with OOB. Some device types cannot be supported because the HomeKit protocol doesn't have similar types.
 
 The supported devices currently are:
+* ButtonsDevice (just the first defined button)
 * ContactSensor
 * DimmerActuator
 * PresenceSensor
@@ -30,7 +31,11 @@ then this device is supported.
 
 
 Apart from the standard devices pimatic-hap supports also devices from third party plugins.
-Currently this applies just to the [pimatic-led-light](https://github.com/philip1986/pimatic-led-light) plugin, but there is more to come. If you are the developer of a pimatic plugin that defines a new device class, that fits into the HomeKit world, just create a [feature request](https://github.com/michbeck100/pimatic-hap/issues/new).
+Currently this applies to
+* [pimatic-led-light](https://github.com/philip1986/pimatic-led-light) - A pimatic plugin for LED lights resp. LED-Stripes
+* [pimatic-hue-zll](https://github.com/markbergsma/pimatic-hue-zll) - Integration of Pimatic with (Zigbee Light Link based) Philips Hue networks, using the Philips Hue (bridge) API.
+
+If you are the developer of a pimatic plugin that defines a new device class, that fits into the HomeKit world, just create a [feature request](https://github.com/michbeck100/pimatic-hap/issues/new).
 
 #### Installation
 
@@ -72,7 +77,7 @@ Example:
 To exclude devices from being registered as Homekit Accessory, just set the "exclude" flag to true. By default all supported devices will be registered.
 
 For some devices it's possible to override the default Service (find the explanation of Services [here](https://github.com/KhaosT/HAP-NodeJS#api)).
-This is helpful if e.g. a lamp is connected to a pimatic-enabled outlet. Changing the Service to "Lightbulb" will make Homekit recognize the outlet as light, not as switch. This may also change the commands, that one can use with Siri.
+This is helpful if e.g. a lamp is connected to a pimatic-enabled outlet. Changing the Service to "Lightbulb" will make Homekit recognize the outlet as light, not as switch. This may also change the commands, that one can use with Siri. Currently just switches may act as a light. If you have suggestions for other possible overrides, that make sense, please create a [feature request](https://github.com/michbeck100/pimatic-hap/issues/new).
 
 Since the "hap" attribute doesn't belong to the device config schema, pimatic will issue a warning,
 that this is an unknown config entry. Maybe it will be officially possible to extend the configuration. Since then just ignore this warning.
@@ -86,6 +91,28 @@ Do you like this plugin? Then consider a donation to support development.
 [![Flattr pimatic-hap](http://api.flattr.com/button/flattr-badge-large.png)](https://flattr.com/submit/auto?user_id=michbeck100&url=https://github.com/michbeck100/pimatic-hap&title=pimatic-hap&language=&tags=github&category=software)
 
 ### Changelog
+0.9.0
+* [#42](https://github.com/michbeck100/pimatic-hap/issues/42) and [#51](https://github.com/michbeck100/pimatic-hap/issues/51) Added GenericAccessory, which adds Services based on attributes
+* Remove device from HomeKit if removed from pimatic
+* Updated to hap-nodejs 0.4.13 
+
+0.8.3
+* Bugfix for shutter handling
+
+0.8.2
+* Reworked shutter implementation to report current state more reliable.
+* Moved identify code from switch to lightbulb.
+* Just ButtonsDevice with 1 button is supported for now
+
+0.8.1
+* Setting internal state on device state change event and before setting characteristic. This should make switching more robust against infinite loops.
+
+0.8.0
+* [#37](https://github.com/michbeck100/pimatic-hap/issues/37)  HomeKit uses 1 and 0 for Characteristic.On, must be converted to bool
+* Added Characteristic.StatusLowBattery to temperature and humidity sensor
+* removed special hue-zll classes and replaced by simplified versions
+* Added implementation for ButtonsDevice. Currently just the first button of a device is supported. Shows up as a normal switch for now, but resets its state after 250 ms.
+
 0.7.0
 * Implementation for Philips Hue Lights controlled by pimatic-hue-zll plugin. Currently just features of HueZLLOnOffLight and HueZLLDimmableLight are supported.
 

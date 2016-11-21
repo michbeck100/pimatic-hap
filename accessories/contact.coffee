@@ -4,24 +4,24 @@ module.exports = (env) ->
   Service = hap.Service
   Characteristic = hap.Characteristic
 
-  BaseAccessory = require('./base')(env)
+  DefaultAccessory = require('./default')(env)
 
   ##
   # ContactSensor
   ##
-  class ContactAccessory extends BaseAccessory
+  class ContactAccessory extends DefaultAccessory
 
     constructor: (device) ->
-      super(device)
+      super(device, Service.ContactSensor)
 
-      @addService(Service.ContactSensor, device.name)
+      @service
         .getCharacteristic(Characteristic.ContactSensorState)
         .on 'get', (callback) =>
           @handleReturnPromise(device.getContact(), callback, @getContactSensorState)
 
       device.on 'contact', (state) =>
-        @getService(Service.ContactSensor)
-          .setCharacteristic(Characteristic.ContactSensorState, @getContactSensorState(state))
+        @service
+          .updateCharacteristic(Characteristic.ContactSensorState, @getContactSensorState(state))
 
     getContactSensorState: (state) =>
       if state

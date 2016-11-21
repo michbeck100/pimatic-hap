@@ -14,20 +14,19 @@ module.exports = (env) ->
     _dimlevel: null
 
     constructor: (device) ->
-      super(device)
+      super(device, Service.Lightbulb)
       @_dimlevel = device._dimlevel
 
-      @getService(Service.Lightbulb)
+      @service
         .getCharacteristic(Characteristic.Brightness)
         .on 'get', (callback) =>
           @handleReturnPromise(device.getDimlevel(), callback, null)
 
       device.on 'dimlevel', (dimlevel) =>
-        @getService(Service.Lightbulb)
-          .setCharacteristic(Characteristic.Brightness, dimlevel)
+        @_dimlevel = dimlevel
+        @service.updateCharacteristic(Characteristic.Brightness, dimlevel)
 
-      @getService(Service.Lightbulb)
-        .getCharacteristic(Characteristic.Brightness)
+      @service.getCharacteristic(Characteristic.Brightness)
         .on 'set', (value, callback) =>
           if @_dimlevel is value
             env.logger.debug 'value ' + value +

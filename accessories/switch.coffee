@@ -4,20 +4,22 @@ module.exports = (env) ->
   Service = hap.Service
   Characteristic = hap.Characteristic
 
-  BaseAccessory = require('./base')(env)
+  DefaultAccessory = require('./default')(env)
 
   # base class for switch actuators
-  class SwitchAccessory extends BaseAccessory
+  class SwitchAccessory extends DefaultAccessory
 
     _state = null
+
+    supportedServiceOverrides: {
+      "Lightbulb": Service.Lightbulb
+    }
 
     constructor: (device) ->
       super(device)
       @_state = device._state
 
-      service = @getServiceOverride()
-      @addService(service, device.name)
-        .getCharacteristic(Characteristic.On)
+      @service.getCharacteristic(Characteristic.On)
         .on 'set', (value, callback) =>
           # HomeKit uses 0 or 1, must be converted to bool
           if value is 1 then value = true
@@ -32,28 +34,10 @@ module.exports = (env) ->
           promise = if value then device.turnOn() else device.turnOff()
           @handleVoidPromise(promise, callback)
 
-      @getService(service)
-        .getCharacteristic(Characteristic.On)
+      @service.getCharacteristic(Characteristic.On)
         .on 'get', (callback) =>
           @handleReturnPromise(device.getState(), callback, null)
 
       device.on 'state', (state) =>
-        @getService(service)
-          .setCharacteristic(Characteristic.On, state)
-
-    # default identify method on switches turns the switch on and off two times
-    identify: (device, paired, callback) =>
-      delay = 500
-      # make sure it's off, then turn on and off twice
-      promise = device.getState()
-        .then( (state) =>
-          device.turnOff()
-          .then( => device.turnOn().delay(delay) )
-          .then( => device.turnOff().delay(delay) )
-          .then( => device.turnOn().delay(delay) )
-          .then( =>
-            # recover initial state
-            device.turnOff().delay(delay) if not state
-          )
-        )
-      @handleVoidPromise(promise, callback)
+        @_state = state
+        @service.updateCharacteristic(Characteristic.On, state)

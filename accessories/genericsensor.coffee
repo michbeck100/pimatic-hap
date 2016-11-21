@@ -9,7 +9,7 @@ module.exports = (env) ->
   ##
   # TemperatureSensor
   ##
-  class TemperatureAccessory extends BaseAccessory
+  class GenericAccessory extends BaseAccessory
 
     constructor: (device) ->
       super(device)
@@ -23,33 +23,34 @@ module.exports = (env) ->
 
         device.on 'temperature', (temperature) =>
           @getService(Service.TemperatureSensor)
-            .setCharacteristic(Characteristic.CurrentTemperature, temperature)
+            .updateCharacteristic(Characteristic.CurrentTemperature, temperature)
 
-        @addBatteryStatus(device, Service.TemperatureSensor)
+        @addBatteryStatus(device, @getService(Service.TemperatureSensor))
 
       # some devices also measure humidity
       if device.hasAttribute('humidity')
         @addService(Service.HumiditySensor, device.name)
+        @getService(Service.HumiditySensor)
           .getCharacteristic(Characteristic.CurrentRelativeHumidity)
           .on 'get', (callback) =>
             @handleReturnPromise(device.getHumidity(), callback, null)
 
         device.on 'humidity', (humidity) =>
           @getService(Service.HumiditySensor)
-            .setCharacteristic(Characteristic.CurrentRelativeHumidity, humidity)
+            .updateCharacteristic(Characteristic.CurrentRelativeHumidity, humidity)
 
-        @addBatteryStatus(device, Service.HumiditySensor)
+        @addBatteryStatus(device, @getService(Service.HumiditySensor))
 
     addBatteryStatus: (device, service) =>
       if device.hasAttribute('lowBattery')
-        @getService(service)
+        service
           .getCharacteristic(Characteristic.StatusLowBattery)
           .on 'get', (callback) =>
             @handleReturnPromise(device.getLowBattery(), callback, @getBatteryStatus)
 
         device.on 'lowBattery', (state) =>
-          @getService(service)
-            .setCharacteristic(Characteristic.StatusLowBattery, @getBatteryStatus(state))
+          service
+            .updateCharacteristic(Characteristic.StatusLowBattery, @getBatteryStatus(state))
 
     getBatteryStatus: (state) =>
       if state

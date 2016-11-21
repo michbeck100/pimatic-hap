@@ -1,11 +1,18 @@
 assert = require "assert"
 grunt = require "grunt"
 
+env =
+  logger:
+    debug: (stmt) ->
+      grunt.log.writeln stmt
+
 describe "base", ->
 
   uuid = require ('hap-nodejs/lib/util/uuid')
+  hap = require 'hap-nodejs'
+  Service = hap.Service
 
-  BaseAccessory = require("../accessories/base")(null)
+  BaseAccessory = require("../accessories/base")(env)
 
   class TestDevice
     id: "test-id"
@@ -19,6 +26,6 @@ describe "base", ->
 
     it "should set displayName and uuid", ->
       device = new TestDevice()
-      accessory = new BaseAccessory(device)
+      accessory = new BaseAccessory(device, Service.Switch)
       assert accessory.displayName is device.name
       assert uuid.isValid(accessory.UUID)

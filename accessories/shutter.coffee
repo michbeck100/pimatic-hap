@@ -5,45 +5,46 @@ module.exports = (env) ->
   Service = hap.Service
   Characteristic = hap.Characteristic
 
-  BaseAccessory = require('./base')(env)
+  DefaultAccessory = require('./default')(env)
 
   ##
   # ShutterController
   #
   # currently shutter is using Service.GarageDoorOpener because Service.Window uses percentages
   # for moving the shutter which is not supported by ShutterController devices
-  class ShutterAccessory extends BaseAccessory
+  class ShutterAccessory extends DefaultAccessory
     _targetState: null
 
     constructor: (device) ->
-      super(device)
+      super(device, Service.GarageDoorOpener)
 
-      @addService(Service.GarageDoorOpener, device.name)
+      @service
         .getCharacteristic(Characteristic.CurrentDoorState)
         .on 'get', (callback) =>
           @handleReturnPromise(device.getPosition(), callback, @getCurrentState)
 
       device.on 'position', (position) =>
-        @getService(Service.GarageDoorOpener)
-          .setCharacteristic(Characteristic.CurrentDoorState, @getCurrentState(position))
+        if position != 'stopped'
+          @_targetState = @getTargetState(position)
+          @service.updateCharacteristic(Characteristic.TargetDoorState, @_targetState)
+        @service.updateCharacteristic(Characteristic.CurrentDoorState, @getCurrentState(position))
 
-      @getService(Service.GarageDoorOpener)
-        .getCharacteristic(Characteristic.TargetDoorState)
-        .on 'get', (callback) =>
-          callback(null, @_targetState)
-
-      @getService(Service.GarageDoorOpener)
-        .getCharacteristic(Characteristic.TargetDoorState)
+      @service.getCharacteristic(Characteristic.TargetDoorState)
+        .on 'get', ((callback) =>
+          callback(null, @_targetState))
         .on 'set', (value, callback) =>
+          if value is @_targetState
+            env.logger.debug 'value ' + value + ' equals current position of ' +
+              device.name + '. Not changing.'
+            callback()
+            return
           promise = null
           if value == Characteristic.TargetDoorState.OPEN
             promise = device.moveUp()
           else if value == Characteristic.TargetDoorState.CLOSED
             promise = device.moveDown()
-          if @_targetState is value
-            promise = device.stop()
           @_targetState = value
-          if (promise != null)
+          if promise
             @handleVoidPromise(promise, callback)
           else
             callback()
@@ -54,6 +55,12 @@ module.exports = (env) ->
         when 'up' then Characteristic.CurrentDoorState.OPEN
         when 'down' then Characteristic.CurrentDoorState.CLOSED
         when 'stopped' then Characteristic.CurrentDoorState.STOPPED
+
+    getTargetState: (position) ->
+      assert position in ['up', 'down']
+      return switch position
+        when 'up' then Characteristic.TargetDoorState.OPEN
+        when 'down' then Characteristic.TargetDoorState.CLOSED
 
     getTargetPosition: (state) ->
       return switch state

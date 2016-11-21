@@ -4,25 +4,23 @@ module.exports = (env) ->
   Service = hap.Service
   Characteristic = hap.Characteristic
 
-  BaseAccessory = require('./base')(env)
+  DefaultAccessory = require('./default')(env)
 
   ##
   # HeatingThermostat
   ##
-  class ThermostatAccessory extends BaseAccessory
+  class ThermostatAccessory extends DefaultAccessory
 
     _temperature: null
 
     constructor: (device) ->
-      super(device)
+      super(device, Service.Thermostat)
 
-      @addService(Service.Thermostat, device.name)
-        .getCharacteristic(Characteristic.TemperatureDisplayUnits)
+      @service.getCharacteristic(Characteristic.TemperatureDisplayUnits)
         .on 'get', (callback) =>
           callback(null, Characteristic.TemperatureDisplayUnits.CELSIUS)
 
-      @getService(Service.Thermostat)
-        .getCharacteristic(Characteristic.CurrentTemperature)
+      @service.getCharacteristic(Characteristic.CurrentTemperature)
         .on 'get', (callback) =>
           if @_temperature == null
             device.getTemperatureSetpoint().then( (temp) =>
@@ -36,13 +34,11 @@ module.exports = (env) ->
       device.on 'temperature', (temp) =>
         @setTemperatureTo(temp)
 
-      @getService(Service.Thermostat)
-        .getCharacteristic(Characteristic.TargetTemperature)
+      @service.getCharacteristic(Characteristic.TargetTemperature)
         .on 'get', (callback) =>
           @handleReturnPromise(device.getTemperatureSetpoint(), callback, null)
 
-      @getService(Service.Thermostat)
-        .getCharacteristic(Characteristic.TargetTemperature)
+      @service.getCharacteristic(Characteristic.TargetTemperature)
         .on 'set', (value, callback) =>
           device.changeTemperatureTo(value)
           # this may be the only chance to get a nearly accurate temperature
@@ -50,40 +46,41 @@ module.exports = (env) ->
           callback()
 
       device.on 'temperatureSetpoint', (target) =>
-        @getService(Service.Thermostat)
-          .setCharacteristic(Characteristic.TargetTemperature, target)
+        @service.updateCharacteristic(Characteristic.TargetTemperature, target)
 
-      @getService(Service.Thermostat)
-        .getCharacteristic(Characteristic.CurrentHeatingCoolingState)
+      @service.getCharacteristic(Characteristic.CurrentHeatingCoolingState)
         .on 'get', (callback) =>
           # don't know what cooling states are supposed to be,
           # for now always return Characteristic.CurrentHeatingCoolingState.HEAT
           callback(null, Characteristic.CurrentHeatingCoolingState.HEAT)
 
-      @getService(Service.Thermostat)
-        .getCharacteristic(Characteristic.TargetHeatingCoolingState)
+      @service.getCharacteristic(Characteristic.TargetHeatingCoolingState)
         .on 'get', (callback) =>
           # don't know what cooling states are supposed to be,
           # for now always return Characteristic.TargetHeatingCoolingState.AUTO
           callback(null, Characteristic.TargetHeatingCoolingState.AUTO)
 
-      @getService(Service.Thermostat)
-        .getCharacteristic(Characteristic.TargetHeatingCoolingState)
+      @service.getCharacteristic(Characteristic.TargetHeatingCoolingState)
         .on 'set', (value, callback) =>
-          # just mode auto is known
-          # the other modes don't match
-          if value == Characteristic.TargetHeatingCoolingState.AUTO
-            device.changeModeTo("auto")
+          mode =
+            switch value
+              when Characteristic.TargetHeatingCoolingState.AUTO then "auto"
+              when Characteristic.TargetHeatingCoolingState.OFF then "manu"
+              when Characteristic.TargetHeatingCoolingState.HEAT then "boost"
+              when Characteristic.TargetHeatingCoolingState.COOL then "manu"
+          device.changeModeTo(mode)
           callback()
 
       device.on 'mode', (mode) =>
-        if mode == "auto"
-          @getService(Service.Thermostat)
-            .setCharacteristic(Characteristic.TargetHeatingCoolingState,
-            Characteristic.TargetHeatingCoolingState.AUTO)
+        coolingstate =
+          switch mode
+            when "auto" then Characteristic.TargetHeatingCoolingState.AUTO
+            when "manu" then Characteristic.TargetHeatingCoolingState.OFF
+            when "boost" then Characteristic.TargetHeatingCoolingState.HEAT
+            else throw new Error("unsupported mode " + mode)
+        @service.updateCharacteristic(Characteristic.TargetHeatingCoolingState, coolingstate)
 
     setTemperatureTo: (temp) =>
       if @_temperature is temp then return
       @_temperature = temp
-      @getService(Service.Thermostat)
-        .setCharacteristic(Characteristic.CurrentTemperature, temp)
+      @service.updateCharacteristic(Characteristic.CurrentTemperature, temp)

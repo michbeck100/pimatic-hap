@@ -4,15 +4,15 @@ process.env['DEBUG'] = 'HAPServer,Accessory,EventedHttpServer'
 module.exports = (env) =>
 
   #import accessories
+  ButtonAccessory = require('./accessories/button')(env)
   ContactAccessory = require('./accessories/contact')(env)
   DimmerAccessory = require('./accessories/dimmer')(env)
-  HueLightAccessory = require('./accessories/hue')(env)
+  GenericAccessory = require('./accessories/genericsensor')(env)
   LightbulbAccessory = require('./accessories/lightbulb')(env)
   LedLightAccessory = require('./accessories/ledlight')(env)
   MotionAccessory = require('./accessories/motion')(env)
   PowerSwitchAccessory = require('./accessories/powerswitch')(env)
   ShutterAccessory = require('./accessories/shutter')(env)
-  TemperatureAccessory = require('./accessories/temperature')(env)
   ThermostatAccessory = require('./accessories/thermostat')(env)
 
   # Require the [cassert library](https://github.com/rhoot/cassert).
@@ -35,15 +35,16 @@ module.exports = (env) =>
   class HapPlugin extends env.plugins.Plugin
 
     knownTemplates: {
+      'buttons': ButtonAccessory
       'dimmer': DimmerAccessory
       'huezllonoff': LightbulbAccessory
       'huezlldimmable': DimmerAccessory
       'huezllcolortemp': DimmerAccessory
-      'huezllcolor': HueLightAccessory
-      'huezllextendedcolor': HueLightAccessory
+      'huezllcolor': DimmerAccessory
+      'huezllextendedcolor': DimmerAccessory
       'switch': PowerSwitchAccessory
       'shutter': ShutterAccessory
-      'temperature': TemperatureAccessory
+      'temperature': GenericAccessory
       'contact': ContactAccessory
       'thermostat': ThermostatAccessory
       'led-light': LedLightAccessory
@@ -113,7 +114,11 @@ module.exports = (env) =>
 
     createAccessoryFromTemplate: (device) =>
       if @isKnownDevice(device)
+        # ButtonsDevice must not have more than one button
+        if device.template is "buttons" and device.config.buttons.length != 1 then return null
         return new @knownTemplates[device.template](device)
+      else if device.hasAttribute('temperature') or device.hasAttribute('humidity')
+        return new GenericAccessory(device)
       else
         env.logger.debug("unsupported device type: " + device.constructor.name)
         return null
