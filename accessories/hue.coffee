@@ -16,34 +16,36 @@ module.exports = (env) ->
       _hue = device._hue
       _sat = device._sat
 
-      @getService(Service.Lightbulb)
-        .getCharacteristic(Characteristic.Hue)
+      @service.getCharacteristic(Characteristic.Hue)
         .on 'get', (callback) =>
-          @handleReturnPromise(device.getHue(), callback, null)
+          @handleReturnPromise(device.getHue(), callback, @getHueInDegree)
 
-      @getService(Service.Lightbulb)
-        .getCharacteristic(Characteristic.Hue)
+      @service.getCharacteristic(Characteristic.Hue)
         .on 'set', (value, callback) =>
-          if value is @_hue
+          hue = value / 360 * 100
+          if hue is @_hue
             callback()
             return
-          @_hue = value
-          @handleVoidPromise(device.changeHueTo(value), callback)
+          @_hue = hue
+          @handleVoidPromise(device.changeHueTo(hue), callback)
 
       device.on 'hue', (hue) =>
-        @getService(Service.Lightbulb)
-          .setCharacteristic(Characteristic.Hue, hue)
+        @service.updateCharacteristic(Characteristic.Hue, @getHueInDegree(hue))
 
-      @getService(Service.Lightbulb)
-        .getCharacteristic(Characteristic.Saturation)
+      @service.getCharacteristic(Characteristic.Saturation)
         .on 'get', (callback) =>
           @handleReturnPromise(device.getSat(), callback, null)
 
-      @getService(Service.Lightbulb)
-        .getCharacteristic(Characteristic.Saturation)
+      device.on 'sat', (sat) =>
+        @service.updateCharacteristic(Characteristic.Saturation, sat)
+
+      @service.getCharacteristic(Characteristic.Saturation)
         .on 'set', (value, callback) =>
           if value == @_sat
             callback()
             return
           @_sat = value
           @handleVoidPromise(device.changeSatTo(value), callback)
+
+    getHueInDegree: (hue) =>
+      return hue / 100 * 360

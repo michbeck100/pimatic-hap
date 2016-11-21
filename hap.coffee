@@ -8,6 +8,7 @@ module.exports = (env) =>
   ContactAccessory = require('./accessories/contact')(env)
   DimmerAccessory = require('./accessories/dimmer')(env)
   GenericAccessory = require('./accessories/genericsensor')(env)
+  HueLightAccessory = require('./accessories/hue')(env)
   LightbulbAccessory = require('./accessories/lightbulb')(env)
   LedLightAccessory = require('./accessories/ledlight')(env)
   MotionAccessory = require('./accessories/motion')(env)
@@ -40,8 +41,8 @@ module.exports = (env) =>
       'huezllonoff': LightbulbAccessory
       'huezlldimmable': DimmerAccessory
       'huezllcolortemp': DimmerAccessory
-      'huezllcolor': DimmerAccessory
-      'huezllextendedcolor': DimmerAccessory
+      'huezllcolor': HueLightAccessory
+      'huezllextendedcolor': HueLightAccessory
       'switch': PowerSwitchAccessory
       'shutter': ShutterAccessory
       'temperature': GenericAccessory
