@@ -62,16 +62,23 @@ module.exports = (env) ->
 
       @service.getCharacteristic(Characteristic.TargetHeatingCoolingState)
         .on 'set', (value, callback) =>
-          # just mode auto is known
-          # the other modes don't match
-          if value == Characteristic.TargetHeatingCoolingState.AUTO
-            device.changeModeTo("auto")
+          mode =
+            switch value
+              when Characteristic.TargetHeatingCoolingState.AUTO then "auto"
+              when Characteristic.TargetHeatingCoolingState.OFF then "manu"
+              when Characteristic.TargetHeatingCoolingState.HEAT then "boost"
+              when Characteristic.TargetHeatingCoolingState.COOL then "manu"
+          device.changeModeTo(mode)
           callback()
 
       device.on 'mode', (mode) =>
-        if mode == "auto"
-          @service.updateCharacteristic(Characteristic.TargetHeatingCoolingState,
-            Characteristic.TargetHeatingCoolingState.AUTO)
+        coolingstate =
+          switch mode
+            when "auto" then Characteristic.TargetHeatingCoolingState.AUTO
+            when "manu" then Characteristic.TargetHeatingCoolingState.OFF
+            when "boost" then Characteristic.TargetHeatingCoolingState.HEAT
+            else throw new Error("unsupported mode " + mode)
+        @service.updateCharacteristic(Characteristic.TargetHeatingCoolingState, coolingstate)
 
     setTemperatureTo: (temp) =>
       if @_temperature is temp then return
