@@ -91,10 +91,13 @@ Do you like this plugin? Then consider a donation to support development.
 [![Flattr pimatic-hap](http://api.flattr.com/button/flattr-badge-large.png)](https://flattr.com/submit/auto?user_id=michbeck100&url=https://github.com/michbeck100/pimatic-hap&title=pimatic-hap&language=&tags=github&category=software)
 
 ### Changelog
+0.9.1
+* [#35](https://github.com/michbeck100/pimatic-hap/issues/35) Support color changing for Philips Hue lights via pimatic-hue-zll plugin
+
 0.9.0
 * [#42](https://github.com/michbeck100/pimatic-hap/issues/42) and [#51](https://github.com/michbeck100/pimatic-hap/issues/51) Added GenericAccessory, which adds Services based on attributes
 * Remove device from HomeKit if removed from pimatic
-* Updated to hap-nodejs 0.4.13 
+* Updated to hap-nodejs 0.4.13
 
 0.8.3
 * Bugfix for shutter handling
