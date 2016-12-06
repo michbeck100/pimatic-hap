@@ -72,6 +72,8 @@ module.exports = (env) ->
           callback()
 
       device.on 'mode', (mode) =>
+        return unless mode?
+
         coolingstate =
           switch mode
             when "auto" then Characteristic.TargetHeatingCoolingState.AUTO
