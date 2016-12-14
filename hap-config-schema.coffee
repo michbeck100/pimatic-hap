@@ -14,5 +14,9 @@ module.exports = {
       description: "The network port that the bridge is using"
       type: "integer"
       default: 51826
+    debug:
+      description: "Enable debug output"
+      type: "boolean"
+      default: false
   }
 }
