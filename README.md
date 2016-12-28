@@ -91,6 +91,10 @@ Do you like this plugin? Then consider a donation to support development.
 [![Flattr pimatic-hap](http://api.flattr.com/button/flattr-badge-large.png)](https://flattr.com/submit/auto?user_id=michbeck100&url=https://github.com/michbeck100/pimatic-hap&title=pimatic-hap&language=&tags=github&category=software)
 
 ### Changelog
+0.9.3
+* [#45](https://github.com/michbeck100/pimatic-hap/issues/45) basic support for pimatic-milight-reloaded
+* Added config extension
+
 0.9.2
 * [#56](https://github.com/michbeck100/pimatic-hap/issues/56) check for undefined mode of thermostat
 
