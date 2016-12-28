@@ -27,6 +27,7 @@ module.exports = (env) =>
   Service = hap.Service
   Characteristic = hap.Characteristic
   uuid = require ('hap-nodejs/lib/util/uuid')
+  _ = require 'lodash'
 
   # bind hap-nodejs' debug logging to pimatic logger
   Debug = require ('hap-nodejs/node_modules/debug')
@@ -85,23 +86,7 @@ module.exports = (env) =>
           category: Accessory.Categories.BRIDGE
         })
 
-      ### currently not possible. see https://github.com/pimatic/pimatic/issues/803
-      @framework.deviceManager.on "registerDeviceClass", (classInfo) =>
-        classInfo.configDef.properties.hap = {
-          type: "object"
-          required: false
-          properties:
-            service:
-              description: "The homekit service to be used for this device"
-              type: "string"
-              required: false
-              enum: ["Lightbulb", "Switch"]
-            exclude:
-              description: "Whether to exclude this device from being bridged"
-              type: "boolean"
-              default: false
-        }
-      ###
+      @framework.deviceManager.deviceConfigExtensions.push(new HapConfigExtension())
 
     generateUniqueUsername: (name) =>
       shasum = crypto.createHash('sha1')
@@ -129,6 +114,32 @@ module.exports = (env) =>
 
     isKnownDevice: (device) =>
       return device.template of @knownTemplates
+
+  class HapConfigExtension
+    configSchema:
+      hap:
+        type: "object"
+        properties:
+          service:
+            description: "The homekit service to be used for this device"
+            type: "string"
+            enum: ["Lightbulb", "Switch"]
+            required: false
+          exclude:
+            description: "Whether to exclude this device from being bridged"
+            type: "boolean"
+            default: false
+        required: false
+
+    extendConfigShema: (schema) ->
+      for name, def of @configSchema
+        schema.properties[name] = _.clone(def)
+      env.logger.info JSON.stringify(schema)
+
+    applicable: (schema) ->
+      return yes
+
+    apply: (config, device) -> # do nothing here
 
   plugin = new HapPlugin()
 
