@@ -134,7 +134,6 @@ module.exports = (env) =>
     extendConfigShema: (schema) ->
       for name, def of @configSchema
         schema.properties[name] = _.clone(def)
-      env.logger.info JSON.stringify(schema)
 
     applicable: (schema) ->
       return yes
