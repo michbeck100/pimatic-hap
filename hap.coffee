@@ -129,11 +129,10 @@ module.exports = (env) =>
             description: "Whether to exclude this device from being bridged"
             type: "boolean"
             default: false
-        required: false
 
     extendConfigShema: (schema) ->
       for name, def of @configSchema
-        schema.properties[name] = _.clone(def)
+        schema.properties[name] = _.cloneDeep(def)
 
     applicable: (schema) ->
       return yes
