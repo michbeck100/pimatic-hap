@@ -44,6 +44,7 @@ module.exports = (env) =>
       'huezllcolortemp': DimmerAccessory
       'huezllcolor': HueLightAccessory
       'huezllextendedcolor': HueLightAccessory
+      'maxcul-heating-thermostat': ThermostatAccessory
       'milight-cwww': LightbulbAccessory
       'milight-rgb': DimmerAccessory
       'milight-rgbw': DimmerAccessory
