@@ -16,8 +16,6 @@ module.exports = (env) =>
   ShutterAccessory = require('./accessories/shutter')(env)
   ThermostatAccessory = require('./accessories/thermostat')(env)
 
-  # Require the [cassert library](https://github.com/rhoot/cassert).
-  assert = env.require 'cassert'
   crypto = env.require 'crypto'
   path = require 'path'
 
@@ -107,7 +105,7 @@ module.exports = (env) =>
         # ButtonsDevice must not have more than one button
         if device.template is "buttons" and device.config.buttons.length != 1 then return null
         return new @knownTemplates[device.template](device)
-      else if device.hasAttribute('temperature') or device.hasAttribute('humidity')
+      else if @hasSupportedAttribute(device)
         return new GenericAccessory(device)
       else
         env.logger.debug("unsupported device type: " + device.constructor.name)
@@ -115,6 +113,12 @@ module.exports = (env) =>
 
     isKnownDevice: (device) =>
       return device.template of @knownTemplates
+
+    hasSupportedAttribute: (device) =>
+      for attr in GenericAccessory.supportedAttributes
+        if device.hasAttribute(attr)
+          return true
+      return false
 
   class HapConfigExtension
     configSchema:

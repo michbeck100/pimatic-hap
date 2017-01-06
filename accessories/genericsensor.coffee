@@ -11,6 +11,8 @@ module.exports = (env) ->
   ##
   class GenericAccessory extends BaseAccessory
 
+    @supportedAttributes: ['temperature', 'humidity', 'co2']
+
     constructor: (device) ->
       super(device)
 
@@ -30,7 +32,6 @@ module.exports = (env) ->
       # some devices also measure humidity
       if device.hasAttribute('humidity')
         @addService(Service.HumiditySensor, device.name)
-        @getService(Service.HumiditySensor)
           .getCharacteristic(Characteristic.CurrentRelativeHumidity)
           .on 'get', (callback) =>
             @handleReturnPromise(device.getHumidity(), callback, null)
@@ -40,6 +41,25 @@ module.exports = (env) ->
             .updateCharacteristic(Characteristic.CurrentRelativeHumidity, humidity)
 
         @addBatteryStatus(device, @getService(Service.HumiditySensor))
+
+      if device.hasAttribute('co2')
+        @addService(Service.CarbonDioxideSensor)
+          .getCharacteristic(Characteristic.CarbonDioxideDetected)
+          .on 'get', (callback) =>
+            device.getCo2().then( co2 -> callback(null, @getCarbonDioxideDetected(co2)))
+
+        @getService(Service.CarbonDioxideSensor)
+          .getCharacteristic(Characteristic.CarbonDioxideLevel)
+          .on 'get', (callback) =>
+            @handleReturnPromise(device.getCo2(), callback, null)
+
+        device.on 'co2', (co2) =>
+          @getService(Service.CarbonDioxideSensor)
+            .updateCharacteristic(Characteristic.CarbonDioxideDetected,
+              @getCarbonDioxideDetected(co2))
+          @getService(Service.CarbonDioxideSensor)
+            .updateCharacteristic(Characteristic.CarbonDioxideLevel, co2)
+
 
     addBatteryStatus: (device, service) =>
       if device.hasAttribute('lowBattery')
@@ -55,5 +75,11 @@ module.exports = (env) ->
     getBatteryStatus: (state) =>
       if state
         return Characteristic.StatusLowBattery.BATTERY_LEVEL_LOW
-      else
-        return Characteristic.StatusLowBattery.BATTERY_LEVEL_NORMAL
+      return Characteristic.StatusLowBattery.BATTERY_LEVEL_NORMAL
+
+    # http://www.raumluft.org/natuerliche-mechanische-lueftung/co2-als-lueftungsindikator/
+    # a value of 1400 ppm should the maximum co2 level
+    getCarbonDioxideDetected: (co2) ->
+      if co2 > 1400
+        return Characteristic.CarbonDioxideDetected.CO2_LEVELS_ABNORMAL
+      return Characteristic.CarbonDioxideDetected.CO2_LEVELS_NORMAL
