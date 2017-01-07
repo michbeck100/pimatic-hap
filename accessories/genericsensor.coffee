@@ -46,7 +46,7 @@ module.exports = (env) ->
         @addService(Service.CarbonDioxideSensor)
           .getCharacteristic(Characteristic.CarbonDioxideDetected)
           .on 'get', (callback) =>
-            device.getCo2().then( co2 -> callback(null, @getCarbonDioxideDetected(co2)))
+            device.getCo2().then( (co2) => callback(null, @getCarbonDioxideDetected(co2)))
 
         @getService(Service.CarbonDioxideSensor)
           .getCharacteristic(Characteristic.CarbonDioxideLevel)
