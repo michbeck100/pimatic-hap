@@ -33,7 +33,12 @@ then this device is supported.
 Apart from the standard devices pimatic-hap supports also devices from third party plugins.
 Currently this applies to
 * [pimatic-led-light](https://github.com/philip1986/pimatic-led-light) - A pimatic plugin for LED lights resp. LED-Stripes
-* [pimatic-hue-zll](https://github.com/markbergsma/pimatic-hue-zll) - Integration of Pimatic with (Zigbee Light Link based) Philips Hue networks, using the Philips Hue (bridge) API.
+* [pimatic-hue-zll](https://github.com/markbergsma/pimatic-hue-zll) - Integration of pimatic with (Zigbee Light Link based) Philips Hue networks, using the Philips Hue (bridge) API.
+* [pimatic-milight-reloaded](https://github.com/mwittig/pimatic-milight-reloaded) - A pimatic plugin to control Milight LED lights and its OEM equivalents
+* [pimatic-maxcul](https://github.com/fbeek/pimatic-maxcul) - A pimatic plugin to control MAX! Heating devices over a Busware CUL stick
+* [pimatic-netatmo](https://github.com/thexperiments/pimatic-netatmo) - A pimatic plugin for supporting Netatmo Weather devices
+
+Note: not all devices that these plugins provide work with pimatic-hap.
 
 If you are the developer of a pimatic plugin that defines a new device class, that fits into the HomeKit world, just create a [feature request](https://github.com/michbeck100/pimatic-hap/issues/new).
 
@@ -91,6 +96,9 @@ Do you like this plugin? Then consider a donation to support development.
 [![Flattr pimatic-hap](http://api.flattr.com/button/flattr-badge-large.png)](https://flattr.com/submit/auto?user_id=michbeck100&url=https://github.com/michbeck100/pimatic-hap&title=pimatic-hap&language=&tags=github&category=software)
 
 ### Changelog
+0.9.5
+* [#62](https://github.com/michbeck100/pimatic-hap/issues/62) Support for co2 sensor devices from pimatic-netatmo
+
 0.9.4
 * [#60](https://github.com/michbeck100/pimatic-hap/issues/60) Support for thermostat devices from pimatic-maxcul
 * No warn message because of missing properties in hap config anymore
