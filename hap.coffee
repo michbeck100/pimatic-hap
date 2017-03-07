@@ -11,6 +11,7 @@ module.exports = (env) =>
   HueLightAccessory = require('./accessories/hue')(env)
   LightbulbAccessory = require('./accessories/lightbulb')(env)
   LedLightAccessory = require('./accessories/ledlight')(env)
+  MilightAccessory = require('./accessories/milight')(env)
   MotionAccessory = require('./accessories/motion')(env)
   PowerSwitchAccessory = require('./accessories/powerswitch')(env)
   ShutterAccessory = require('./accessories/shutter')(env)
@@ -44,8 +45,8 @@ module.exports = (env) =>
       'huezllextendedcolor': HueLightAccessory
       'maxcul-heating-thermostat': ThermostatAccessory
       'milight-cwww': LightbulbAccessory
-      'milight-rgb': DimmerAccessory
-      'milight-rgbw': DimmerAccessory
+      'milight-rgb': MilightAccessory
+      'milight-rgbw': MilightAccessory
       'switch': PowerSwitchAccessory
       'shutter': ShutterAccessory
       'temperature': GenericAccessory
