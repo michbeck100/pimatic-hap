@@ -28,6 +28,7 @@ module.exports = (env) ->
             .updateCharacteristic(Characteristic.CurrentTemperature, temperature)
 
         @addBatteryStatus(device, @getService(Service.TemperatureSensor))
+        @addRemoveListener(device, @getService(Service.TemperatureSensor))
 
       # some devices also measure humidity
       if device.hasAttribute('humidity')
@@ -41,6 +42,7 @@ module.exports = (env) ->
             .updateCharacteristic(Characteristic.CurrentRelativeHumidity, humidity)
 
         @addBatteryStatus(device, @getService(Service.HumiditySensor))
+        @addRemoveListener(device, @getService(Service.HumiditySensor))
 
       if device.hasAttribute('co2')
         @addService(Service.CarbonDioxideSensor)
@@ -59,6 +61,8 @@ module.exports = (env) ->
               @getCarbonDioxideDetected(co2))
           @getService(Service.CarbonDioxideSensor)
             .updateCharacteristic(Characteristic.CarbonDioxideLevel, co2)
+
+        @addRemoveListener(device, @getService(Service.CarbonDioxideSensor))
 
 
     addBatteryStatus: (device, service) =>
@@ -83,3 +87,8 @@ module.exports = (env) ->
       if co2 > 1400
         return Characteristic.CarbonDioxideDetected.CO2_LEVELS_ABNORMAL
       return Characteristic.CarbonDioxideDetected.CO2_LEVELS_NORMAL
+
+    addRemoveListener: (device, service) =>
+      device.on 'remove', () =>
+        env.logger.debug 'removing device ' + device.name
+        @removeService(service)
