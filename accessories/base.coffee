@@ -11,10 +11,27 @@ module.exports = (env) ->
 
     hapConfig: null
 
-    constructor: (device) ->
+    constructor: (device, deviceId, deviceName) ->
+      # this handling is needed in order to support pimatic devices
+      # which need to be represented by mutiple homekit devices
+      # as function overloading is not supportet in node
+
+      if !deviceId?
+        # deviceId was omitted in constructor call thus we need to fill it accordingly
+        deviceId = device.id
+        # same for deviceName
+        deviceName = device.name
+        # to stay compatible we will only use the deviceId for serial generation
+        deviceSerialId = deviceId
+      else
+        # if the parameters were passed to the constructor (and likely to be modified)
+        # we will use a combination of deviceId and deviceName for generating the serial
+        deviceSerialId = deviceId + deviceName
+
       @hapConfig = device.config.hap
-      serialNumber = uuid.generate('pimatic-hap:accessories:' + device.id)
-      super(device.name, serialNumber)
+
+      serialNumber = uuid.generate('pimatic-hap:accessories:' + deviceSerialId)
+      super(deviceName, serialNumber)
 
       @getService(Service.AccessoryInformation)
         .setCharacteristic(Characteristic.Manufacturer, "Pimatic")
@@ -24,7 +41,7 @@ module.exports = (env) ->
       @addService(Service.BridgingState)
         .getCharacteristic(Characteristic.Reachable)
         .on 'set', (value, callback) =>
-          env.logger.warn 'accessory ' + device.id + ' was set to unreachable!' unless value
+          env.logger.warn 'accessory ' + deviceId + ' was set to unreachable!' unless value
           callback()
 
       @on 'identify', (paired, callback) =>

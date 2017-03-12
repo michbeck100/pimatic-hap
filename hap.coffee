@@ -68,11 +68,19 @@ module.exports = (env) =>
         callback()
 
       @framework.on 'deviceAdded', (device) =>
-        accessory = @createAccessoryFromTemplate(device)
+        newAccessories = []
+        newAccessories[0] = @createAccessoryFromTemplate(device)
+        if !newAccessories[0]?
+          # accesory not yet created
+          # try if it is an accesory which needs to be represented by multiple
+          # homekit devices
+          newAccessories = @createAccessoriesFromTemplate(device)
 
-        if accessory? && !accessory.exclude()
-          bridge.addBridgedAccessory(accessory)
-          env.logger.debug("successfully added device " + device.name)
+        if newAccessories?
+          for accessory in newAccessories
+            if accessory? && !accessory.exclude()
+              bridge.addBridgedAccessory(accessory)
+              env.logger.debug("successfully added device " + device.name)
 
       @framework.once "after init", =>
         # publish homekit bridge
@@ -108,6 +116,20 @@ module.exports = (env) =>
         return new @knownTemplates[device.template](device)
       else if @hasSupportedAttribute(device)
         return new GenericAccessory(device)
+      else
+        env.logger.debug("unsupported device type: " + device.constructor.name)
+        return null
+
+    createAccessoriesFromTemplate: (device) =>
+      newAccessories = []
+      if @isKnownDevice(device)
+        if device.template is "buttons" and device.config.buttons.length > 1
+        
+          for b in device.config.buttons
+            newAccessories.push new @knownTemplates[device.template](device, b)
+
+          return newAccessories
+
       else
         env.logger.debug("unsupported device type: " + device.constructor.name)
         return null
