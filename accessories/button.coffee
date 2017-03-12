@@ -33,7 +33,7 @@ module.exports = (env) ->
 
       @service.getCharacteristic(Characteristic.On)
         .on 'set', (value, callback) =>
-          if value is 1
+          if value is 1 || value is true
             @handleVoidPromise(device.buttonPressed(button.id)
               .then( => setTimeout(reset, 250)), callback)
           else
