@@ -26,6 +26,6 @@ describe "base", ->
 
     it "should set displayName and uuid", ->
       device = new TestDevice()
-      accessory = new BaseAccessory(device, Service.Switch)
+      accessory = new BaseAccessory(device)
       assert accessory.displayName is device.name
       assert uuid.isValid(accessory.UUID)
