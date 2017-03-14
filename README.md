@@ -96,6 +96,12 @@ Do you like this plugin? Then consider a donation to support development.
 [![Flattr pimatic-hap](http://api.flattr.com/button/flattr-badge-large.png)](https://flattr.com/submit/auto?user_id=michbeck100&url=https://github.com/michbeck100/pimatic-hap&title=pimatic-hap&language=&tags=github&category=software)
 
 ### Changelog
+0.10.0
+* [#64](https://github.com/michbeck100/pimatic-hap/issues/64) add remove listener for sensor devices
+* [#45](https://github.com/michbeck100/pimatic-hap/issues/45) Add extended support for milight devices
+* Update to hap-nodejs 0.4.21
+
+
 0.9.5
 * [#62](https://github.com/michbeck100/pimatic-hap/issues/62) Support for co2 sensor devices from pimatic-netatmo
 
