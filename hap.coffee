@@ -68,13 +68,7 @@ module.exports = (env) =>
         callback()
 
       @framework.on 'deviceAdded', (device) =>
-        newAccessories = []
-        newAccessories[0] = @createAccessoryFromTemplate(device)
-        if !newAccessories[0]?
-          # accesory not yet created
-          # try if it is an accesory which needs to be represented by multiple
-          # homekit devices
-          newAccessories = @createAccessoriesFromTemplate(device)
+        newAccessories = @createAccessoriesFromTemplate(device)
 
         if newAccessories?
           for accessory in newAccessories
@@ -109,27 +103,26 @@ module.exports = (env) =>
           hash[8] + hash[9] + ':' +
           hash[10] + hash[11]
 
-    createAccessoryFromTemplate: (device) =>
-      if @isKnownDevice(device)
-        # ButtonsDevice must not have more than one button
-        if device.template is "buttons" and device.config.buttons.length != 1 then return null
-        return new @knownTemplates[device.template](device)
-      else if @hasSupportedAttribute(device)
-        return new GenericAccessory(device)
-      else
-        env.logger.debug("unsupported device type: " + device.constructor.name)
-        return null
-
     createAccessoriesFromTemplate: (device) =>
       newAccessories = []
       if @isKnownDevice(device)
+        # special handling for ButtonsDevice with more than one button
+        # ButtonsDevice with one Button will fall through and uses old
+        # approach like all other devices
         if device.template is "buttons" and device.config.buttons.length > 1
-        
           for b in device.config.buttons
             newAccessories.push new @knownTemplates[device.template](device, b)
-
           return newAccessories
-
+        #legacy handling to catch ButtonDevices with no button
+        if device.template is "buttons" and device.config.buttons.length < 1 
+          return newAccessories
+        #all other devices go here
+        newAccessories.push new @knownTemplates[device.template](device)
+        return newAccessories
+      else if @hasSupportedAttribute(device)
+        #generic devices go here
+        newAccessories.push new GenericAccessory(device)
+        return newAccessories
       else
         env.logger.debug("unsupported device type: " + device.constructor.name)
         return null
