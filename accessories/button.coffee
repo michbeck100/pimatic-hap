@@ -23,7 +23,7 @@ module.exports = (env) ->
         #manipulate device name to reflect buttons-device + button name
         deviceName = "#{device.name} #{buttonToTrigger.text}"
         #manipulate device ID to allow multiple instances of device
-        deviceId = device.id + buttonToTrigger.id
+        deviceId = "#{device.id}_#{buttonToTrigger.id}"
 
         super(device, Service.Switch, deviceId, deviceName)
         button = buttonToTrigger

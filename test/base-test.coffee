@@ -24,8 +24,19 @@ describe "base", ->
 
   describe "basics", ->
 
-    it "should set displayName and uuid", ->
+    it "should set displayName and uuid with only device as parameter", ->
       device = new TestDevice()
       accessory = new BaseAccessory(device)
       assert accessory.displayName is device.name
+      assert uuid.isValid(accessory.UUID)
+
+    device = null
+    accessory = null
+
+    it "should set displayName and uuid with custom deviceId and deviceName", ->
+      device = new TestDevice()
+      deviceId = "fancy_device"
+      deviceName = "Fancy Device"
+      accessory = new BaseAccessory(device, deviceId, deviceName)
+      assert accessory.displayName is deviceName
       assert uuid.isValid(accessory.UUID)

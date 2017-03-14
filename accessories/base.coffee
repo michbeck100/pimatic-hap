@@ -21,16 +21,10 @@ module.exports = (env) ->
         deviceId = device.id
         # same for deviceName
         deviceName = device.name
-        # to stay compatible we will only use the deviceId for serial generation
-        deviceSerialId = deviceId
-      else
-        # if the parameters were passed to the constructor (and likely to be modified)
-        # we will use a combination of deviceId and deviceName for generating the serial
-        deviceSerialId = deviceId + deviceName
 
       @hapConfig = device.config.hap
 
-      serialNumber = uuid.generate('pimatic-hap:accessories:' + deviceSerialId)
+      serialNumber = uuid.generate('pimatic-hap:accessories:' + deviceId)
       super(deviceName, serialNumber)
 
       @getService(Service.AccessoryInformation)
