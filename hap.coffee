@@ -74,7 +74,7 @@ module.exports = (env) =>
           for accessory in newAccessories
             if accessory? && !accessory.exclude()
               bridge.addBridgedAccessory(accessory)
-              env.logger.debug("successfully added device " + device.name)
+              env.logger.debug("successfully added device " + accessory.displayName)
 
       @framework.once "after init", =>
         # publish homekit bridge
