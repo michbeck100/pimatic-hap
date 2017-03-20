@@ -68,11 +68,13 @@ module.exports = (env) =>
         callback()
 
       @framework.on 'deviceAdded', (device) =>
-        accessory = @createAccessoryFromTemplate(device)
+        newAccessories = @createAccessoriesFromTemplate(device)
 
-        if accessory? && !accessory.exclude()
-          bridge.addBridgedAccessory(accessory)
-          env.logger.debug("successfully added device " + device.name)
+        if newAccessories?
+          for accessory in newAccessories
+            if accessory? && !accessory.exclude()
+              bridge.addBridgedAccessory(accessory)
+              env.logger.debug("successfully added device " + accessory.displayName)
 
       @framework.once "after init", =>
         # publish homekit bridge
@@ -101,13 +103,26 @@ module.exports = (env) =>
           hash[8] + hash[9] + ':' +
           hash[10] + hash[11]
 
-    createAccessoryFromTemplate: (device) =>
+    createAccessoriesFromTemplate: (device) =>
+      newAccessories = []
       if @isKnownDevice(device)
-        # ButtonsDevice must not have more than one button
-        if device.template is "buttons" and device.config.buttons.length != 1 then return null
-        return new @knownTemplates[device.template](device)
+        # special handling for ButtonsDevice with more than one button
+        # ButtonsDevice with one Button will fall through and uses old
+        # approach like all other devices
+        if device.template is "buttons" and device.config.buttons.length > 1
+          for b in device.config.buttons
+            newAccessories.push new @knownTemplates[device.template](device, b)
+          return newAccessories
+        #legacy handling to catch ButtonDevices with no button
+        if device.template is "buttons" and device.config.buttons.length < 1 
+          return newAccessories
+        #all other devices go here
+        newAccessories.push new @knownTemplates[device.template](device)
+        return newAccessories
       else if @hasSupportedAttribute(device)
-        return new GenericAccessory(device)
+        #generic devices go here
+        newAccessories.push new GenericAccessory(device)
+        return newAccessories
       else
         env.logger.debug("unsupported device type: " + device.constructor.name)
         return null

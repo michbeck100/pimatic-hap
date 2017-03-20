@@ -9,12 +9,24 @@ module.exports = (env) ->
 
     service: null
 
-    constructor: (device, service) ->
-      super(device)
+    constructor: (device, service, deviceId, deviceName) ->
+      #this handling is needed in order to support pimatic devices
+      #which need to be represented by mutiple homekit devices
+      #as function overloading is not supportet in node
+      if !deviceId?
+        #deviceId was omitted in constructor call thus we need to fill it accordingly
+        deviceId = device.id
+        #same for deviceName
+        deviceName = device.name
+        #call super without the parameters to propagate that they were not manipulated
+        super(device)
+      else
+        super(device, deviceId, deviceName)
+      
       service = @getServiceOverride(device.config?.hap) unless service
-      @service = @addService(service, device.name)
+      @service = @addService(service, deviceName)
       device.on 'remove', () =>
-        env.logger.debug 'removing device ' + device.name
+        env.logger.debug 'removing device ' + deviceName
         @removeService(@service)
 
 
