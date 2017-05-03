@@ -21,7 +21,7 @@ module.exports = (env) ->
       @service.getCharacteristic(Characteristic.Hue)
         .on 'set', (value, callback) =>
           # value = 0 -> hue = 176
-          hue = @getHueForMilight(value)
+          hue = @_getHueForMilight(value)
           if hue is @_hue
             callback()
             return
