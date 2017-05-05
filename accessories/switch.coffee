@@ -36,7 +36,9 @@ module.exports = (env) ->
 
       @service.getCharacteristic(Characteristic.On)
         .on 'get', (callback) =>
-          @handleReturnPromise(device.getState(), callback, null)
+          state = device.getState(),
+          return unless state?
+          @handleReturnPromise(state, callback, null)
 
       device.on 'state', (state) =>
         @_state = state
