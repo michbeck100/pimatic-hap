@@ -54,6 +54,8 @@ module.exports = (env) =>
       'thermostat': ThermostatAccessory
       'led-light': LedLightAccessory
       'presence': MotionAccessory
+      'tradfridimmer-dimmer': DimmerAccessory
+      'tradfridimmer-temp': DimmerAccessory
     }
 
     init: (app, @framework, @config) =>
