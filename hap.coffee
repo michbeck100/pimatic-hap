@@ -58,6 +58,8 @@ module.exports = (env) =>
       'tradfridimmer-temp': DimmerAccessory
     }
 
+    accessories: {}
+
     init: (app, @framework, @config) =>
       env.logger.info("Starting homekit bridge")
 
@@ -76,7 +78,14 @@ module.exports = (env) =>
           for accessory in newAccessories
             if accessory? && !accessory.exclude()
               bridge.addBridgedAccessory(accessory)
+              if !@accessories.hasOwnProperty(device.id)
+                @accessories[device.id] = []
+              @accessories[device.id].push accessory
               env.logger.debug("successfully added device " + accessory.displayName)
+
+      @framework.on 'deviceRemoved', (device) =>
+        if device.id in @accessories
+          bridge.removeBridgedAccessory(entry.id, false) for entry in accessories[device.id]
 
       @framework.once "after init", =>
         # publish homekit bridge
