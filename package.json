@@ -23,7 +23,7 @@
     "test": "grunt test"
   },
   "dependencies": {
-    "hap-nodejs": "0.4.21",
+    "hap-nodejs": "0.4.32",
     "color-convert": "1.0.0",
     "lodash": "^4.16.4"
   },
