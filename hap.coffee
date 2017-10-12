@@ -55,6 +55,7 @@ module.exports = (env) =>
       'led-light': LedLightAccessory
       'presence': MotionAccessory
       'tradfridimmer-dimmer': DimmerAccessory
+      'tradfridimmer-rgb': DimmerAccessory
       'tradfridimmer-temp': DimmerAccessory
     }
 
