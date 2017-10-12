@@ -37,6 +37,7 @@ Currently this applies to
 * [pimatic-milight-reloaded](https://github.com/mwittig/pimatic-milight-reloaded) - A pimatic plugin to control Milight LED lights and its OEM equivalents
 * [pimatic-maxcul](https://github.com/fbeek/pimatic-maxcul) - A pimatic plugin to control MAX! Heating devices over a Busware CUL stick
 * [pimatic-netatmo](https://github.com/thexperiments/pimatic-netatmo) - A pimatic plugin for supporting Netatmo Weather devices
+* [pimatic-tradfri](https://github.com/treban/pimatic-tradfri) - A pimatic plugin for supporting IKEA Tradfri LED light bulbs
 
 Note: not all devices that these plugins provide work with pimatic-hap.
 
@@ -58,7 +59,7 @@ This will fetch the most recent version from npm-registry on the next pimatic st
 
 Please use 031-45-154 as pin, when pairing with the pimatic homekit bridge.
 
-Every iOS app that works with homekit should work with this (like Elgato Eve), so no need for an Apple developer account.
+Every iOS app that works with homekit should work with this (like Apple Home app), so no need for an Apple developer account.
 
 #### Configuration
 
@@ -85,7 +86,8 @@ For some devices it's possible to override the default Service (find the explana
 This is helpful if e.g. a lamp is connected to a pimatic-enabled outlet. Changing the Service to "Lightbulb" will make Homekit recognize the outlet as light, not as switch. This may also change the commands, that one can use with Siri. Currently just switches may act as a light. If you have suggestions for other possible overrides, that make sense, please create a [feature request](https://github.com/michbeck100/pimatic-hap/issues/new).
 
 Since the "hap" attribute doesn't belong to the device config schema, pimatic will issue a warning,
-that this is an unknown config entry. Maybe it will be officially possible to extend the configuration. Since then just ignore this warning.
+that this is an unknown config entry. Maybe it will be officially possible to extend the configuration. 
+Since then make sure that pimatic-hap is placed first in your config or just ignore this warning.
 
 
 ### Sponsoring
@@ -96,11 +98,18 @@ Do you like this plugin? Then consider a donation to support development.
 [![Flattr pimatic-hap](http://api.flattr.com/button/flattr-badge-large.png)](https://flattr.com/submit/auto?user_id=michbeck100&url=https://github.com/michbeck100/pimatic-hap&title=pimatic-hap&language=&tags=github&category=software)
 
 ### Changelog
+0.11.0
+* [#73](https://github.com/michbeck100/pimatic-hap/issues/73) add tradfri support 
+  * dimming for lights and groups
+  * group scene switching
+* [#70](https://github.com/michbeck100/pimatic-hap/issues/70) fix wrong method call 
+* [#68](https://github.com/michbeck100/pimatic-hap/issues/68) add support for multiple buttons on a ButtonsDevice
+* Update to hap-nodejs 0.4.33
+
 0.10.0
 * [#64](https://github.com/michbeck100/pimatic-hap/issues/64) add remove listener for sensor devices
 * [#45](https://github.com/michbeck100/pimatic-hap/issues/45) Add extended support for milight devices
 * Update to hap-nodejs 0.4.21
-
 
 0.9.5
 * [#62](https://github.com/michbeck100/pimatic-hap/issues/62) Support for co2 sensor devices from pimatic-netatmo
