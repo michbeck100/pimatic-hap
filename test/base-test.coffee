@@ -11,6 +11,7 @@ describe "base", ->
   uuid = require ('hap-nodejs/lib/util/uuid')
   hap = require 'hap-nodejs'
   Service = hap.Service
+  Characteristic = hap.Characteristic
 
   BaseAccessory = require("../accessories/base")(env)
 
@@ -40,3 +41,29 @@ describe "base", ->
       accessory = new BaseAccessory(device, deviceId, deviceName)
       assert accessory.displayName is deviceName
       assert uuid.isValid(accessory.UUID)
+
+    it "should set bridging state", ->
+      device = new TestDevice()
+      accessory = new BaseAccessory(device)
+      service = accessory.getService(Service.BridgingState)
+      assert service
+      isReachable = false
+      service.getCharacteristic(Characteristic.Reachable).getValue((error, value) ->
+        isReachable = value
+      )
+      assert(isReachable)
+      linkQuality = 0
+      service.getCharacteristic(Characteristic.LinkQuality).getValue((error, value) ->
+        linkQuality = value
+      )
+      assert(linkQuality == 4)
+      identifier = null
+      service.getCharacteristic(Characteristic.AccessoryIdentifier).getValue((error, value) ->
+        identifier = value
+      )
+      assert(identifier == accessory.UUID)
+      category = null
+      service.getCharacteristic(Characteristic.Category).getValue((error, value) ->
+        category = value
+      )
+      assert(category == accessory.category)
