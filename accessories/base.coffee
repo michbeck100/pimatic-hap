@@ -32,11 +32,15 @@ module.exports = (env) ->
         .setCharacteristic(Characteristic.Model, "Rev-1")
         .setCharacteristic(Characteristic.SerialNumber, serialNumber)
 
-      @addService(Service.BridgingState)
-        .getCharacteristic(Characteristic.Reachable)
-        .on 'set', (value, callback) =>
-          env.logger.warn 'accessory ' + deviceId + ' was set to unreachable!' unless value
-          callback()
+      bridgingState =  @addService(Service.BridgingState)
+      bridgingState.getCharacteristic(Characteristic.Reachable)
+        .setValue(true)
+      bridgingState.getCharacteristic(Characteristic.LinkQuality)
+        .setValue(4)
+      bridgingState.getCharacteristic(Characteristic.AccessoryIdentifier)
+        .setValue(serialNumber)
+      bridgingState.getCharacteristic(Characteristic.Category)
+        .setValue(@category)
 
       @on 'identify', (paired, callback) =>
         @identify(device, paired, callback)
