@@ -11,7 +11,7 @@ module.exports = (env) ->
 
     hapConfig: null
 
-    constructor: (device, deviceId, deviceName) ->
+    constructor: (device, deviceId, category, deviceName) ->
       # this handling is needed in order to support pimatic devices
       # which need to be represented by mutiple homekit devices
       # as function overloading is not supportet in node
@@ -40,7 +40,7 @@ module.exports = (env) ->
       bridgingState.getCharacteristic(Characteristic.AccessoryIdentifier)
         .setValue(serialNumber)
       bridgingState.getCharacteristic(Characteristic.Category)
-        .setValue(@category)
+        .setValue(category ? category : Characteristic.Categories.OTHER)
 
       @on 'identify', (paired, callback) =>
         @identify(device, paired, callback)

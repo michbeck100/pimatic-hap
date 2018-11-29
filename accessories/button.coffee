@@ -17,7 +17,7 @@ module.exports = (env) ->
         # without additional parameters to propagate that they were not manipulated
         # basically this is legacy handling to support previous behaviour with
         # support for only one button
-        super(device, Service.Switch)
+        super(device, Service.Switch, device.name, Characteristic.Categories.SWITCH)
         button = device.config.buttons[0]
       else
         #manipulate device name to reflect buttons-device + button name
@@ -25,7 +25,7 @@ module.exports = (env) ->
         #manipulate device ID to allow multiple instances of device
         deviceId = "#{device.id}_#{buttonToTrigger.id}"
 
-        super(device, Service.Switch, deviceId, deviceName)
+        super(device, Service.Switch, deviceId, deviceName, Characteristic.Categories.SWITCH)
         button = buttonToTrigger
 
       reset = () =>

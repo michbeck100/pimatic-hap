@@ -12,7 +12,7 @@ module.exports = (env) ->
   class ContactAccessory extends DefaultAccessory
 
     constructor: (device) ->
-      super(device, Service.ContactSensor)
+      super(device, Service.ContactSensor, Characteristic.Categories.SENSOR)
 
       @service
         .getCharacteristic(Characteristic.ContactSensorState)
