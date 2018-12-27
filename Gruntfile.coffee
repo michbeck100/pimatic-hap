@@ -24,7 +24,6 @@ module.exports = (grunt) ->
       test:
         options:
           reporter: "spec"
-          require: ['coffee-errors'] #needed for right line numbers in errors
         src: ["test/*"]
       # blanket is used to record coverage
       testBlanket:

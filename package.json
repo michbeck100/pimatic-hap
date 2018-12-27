@@ -11,7 +11,7 @@
     "hap-config-schema.coffee",
     "LICENSE"
   ],
-  "version": "0.11.1",
+  "version": "0.12.0",
   "homepage": "https://github.com/michbeck100/pimatic-hap",
   "private": false,
   "repository": {
@@ -30,20 +30,18 @@
   "devDependencies": {
     "blanket": "^1.2.2",
     "bluebird": "^3.3.4",
-    "coffee-errors": "^0.8.6",
-    "coffee-script": "^1.10.0",
-    "grunt": "^0.4.5",
-    "grunt-cli": "^0.1.13",
-    "grunt-coffeelint": "0.0.8",
-    "grunt-mocha-test": "^0.12.7",
+    "coffeescript": "^2.2.1",
+    "grunt": "^1.0.1",
+    "grunt-bump": "0.8.0",
+    "grunt-cli": "^1.2.0",
+    "grunt-coffeelint": "vojtajina/grunt-coffeelint#coffeelint2-dev",
+    "grunt-mocha-test": "^0.13.2",
     "mocha": "^2.4.5",
-    "chai": "3.5.0"
-  },
-  "peerDependencies": {
+    "chai": "3.5.0",
     "pimatic": "~0.9.0"
   },
   "engines": {
-    "node": ">0.10.x",
+    "node": ">= 4",
     "npm": ">1.1.x"
   }
 }
