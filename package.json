@@ -11,7 +11,7 @@
     "hap-config-schema.coffee",
     "LICENSE"
   ],
-  "version": "0.11.1",
+  "version": "0.11.2",
   "homepage": "https://github.com/michbeck100/pimatic-hap",
   "private": false,
   "repository": {
