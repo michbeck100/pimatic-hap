@@ -98,6 +98,9 @@ Do you like this plugin? Then consider a donation to support development.
 [![Flattr pimatic-hap](http://api.flattr.com/button/flattr-badge-large.png)](https://flattr.com/submit/auto?user_id=michbeck100&url=https://github.com/michbeck100/pimatic-hap&title=pimatic-hap&language=&tags=github&category=software)
 
 ### Changelog
+0.11.2
+* [#81](https://github.com/michbeck100/pimatic-hap/issues/81) Fix problems with new bluebird library
+
 0.11.0
 * [#73](https://github.com/michbeck100/pimatic-hap/issues/73) add tradfri support 
   * dimming for lights and groups
