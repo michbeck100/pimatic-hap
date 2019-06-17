@@ -6,6 +6,9 @@ env =
   logger:
     debug: (stmt) ->
       grunt.log.writeln stmt
+  require: (module) ->
+    require(module)
+
 SwitchAccessory = require("../accessories/switch")(env)
 hap = require 'hap-nodejs'
 Service = hap.Service

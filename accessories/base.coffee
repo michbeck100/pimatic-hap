@@ -1,6 +1,8 @@
 module.exports = (env) ->
 
   hap = require 'hap-nodejs'
+  Promise = env.require 'bluebird'
+
   Accessory = hap.Accessory
   Service = hap.Service
   Characteristic = hap.Characteristic
@@ -51,7 +53,7 @@ module.exports = (env) ->
 
     ## calls promise, then callback, and handles errors
     handleVoidPromise: (promise, callback) =>
-      promise
+      Promise.resolve(promise)
         .then( => callback() )
         .catch( (error) =>
           env.logger.error "Could not call promise: " + error.message
@@ -61,7 +63,7 @@ module.exports = (env) ->
         .done()
 
     handleReturnPromise: (promise, callback, converter) =>
-      promise
+      Promise.resolve(promise)
         .then( (value) =>
           if converter != null
             value = converter(value)

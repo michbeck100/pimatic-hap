@@ -6,6 +6,9 @@ env =
   logger:
     debug: (stmt) ->
       grunt.log.writeln stmt
+  require: (module) ->
+    require(module)
+
 TemperatureAccessory = require("../accessories/genericsensor")(env)
 hap = require 'hap-nodejs'
 Service = hap.Service

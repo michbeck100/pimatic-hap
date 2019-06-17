@@ -5,6 +5,8 @@ env =
   logger:
     debug: (stmt) ->
       grunt.log.writeln stmt
+  require: (module) ->
+    require(module)
 
 describe "base", ->
 

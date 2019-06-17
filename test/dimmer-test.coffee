@@ -6,6 +6,9 @@ env =
   logger:
     debug: (stmt) ->
       grunt.log.writeln stmt
+  require: (module) ->
+    require(module)
+
 DimmerAccessory = require("../accessories/dimmer")(env)
 hap = require 'hap-nodejs'
 Service = hap.Service

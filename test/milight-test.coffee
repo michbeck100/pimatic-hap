@@ -5,6 +5,9 @@ env =
   logger:
     debug: (stmt) ->
       grunt.log.writeln stmt
+  require: (module) ->
+    require(module)
+
 MilightAccessory = require("../accessories/milight")(env)
 hap = require 'hap-nodejs'
 Service = hap.Service

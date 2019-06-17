@@ -8,6 +8,9 @@ env =
       grunt.log.writeln stmt
     error: (stmt) ->
       grunt.log.writeln stmt
+  require: (module) ->
+    require(module)
+
 ShutterAccessory = require("../accessories/shutter")(env)
 hap = require 'hap-nodejs'
 Service = hap.Service
@@ -112,7 +115,7 @@ describe "shutter", ->
         .getCharacteristic(Characteristic.TargetDoorState)
         .setValue(Characteristic.TargetDoorState.OPEN)
       assert count is 1
-      
+
   describe "getCurrentState", ->
 
     it "should return correct value", ->
