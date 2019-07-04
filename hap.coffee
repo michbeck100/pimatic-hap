@@ -57,6 +57,9 @@ module.exports = (env) =>
       'tradfridimmer-dimmer': DimmerAccessory
       'tradfridimmer-rgb': DimmerAccessory
       'tradfridimmer-temp': DimmerAccessory
+      'raspbee-dimmer': DimmerAccessory
+      'raspbee-ct': DimmerAccessory
+      'raspbee-rgb': DimmerAccessory
     }
 
     accessories: {}
@@ -126,7 +129,7 @@ module.exports = (env) =>
             newAccessories.push new @knownTemplates[device.template](device, b)
           return newAccessories
         #legacy handling to catch ButtonDevices with no button
-        if device.template is "buttons" and device.config.buttons.length < 1 
+        if device.template is "buttons" and device.config.buttons.length < 1
           return newAccessories
         #all other devices go here
         newAccessories.push new @knownTemplates[device.template](device)
