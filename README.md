@@ -38,6 +38,7 @@ Currently this applies to
 * [pimatic-maxcul](https://github.com/fbeek/pimatic-maxcul) - A pimatic plugin to control MAX! Heating devices over a Busware CUL stick
 * [pimatic-netatmo](https://github.com/thexperiments/pimatic-netatmo) - A pimatic plugin for supporting Netatmo Weather devices
 * [pimatic-tradfri](https://github.com/treban/pimatic-tradfri) - A pimatic plugin for supporting IKEA Tradfri LED light bulbs
+* [pimatic-raspbee](https://github.com/treban/pimatic-raspbee) - Provides a raspbee interface for pimatic
 
 Note: not all devices that these plugins provide work with pimatic-hap.
 
@@ -98,6 +99,9 @@ Do you like this plugin? Then consider a donation to support development.
 [![Flattr pimatic-hap](http://api.flattr.com/button/flattr-badge-large.png)](https://flattr.com/submit/auto?user_id=michbeck100&url=https://github.com/michbeck100/pimatic-hap&title=pimatic-hap&language=&tags=github&category=software)
 
 ### Changelog
+0.12.0
+* [#81](https://github.com/michbeck100/pimatic-hap/issues/80) Add support for pimatic-raspbee
+
 0.11.2
 * [#81](https://github.com/michbeck100/pimatic-hap/issues/81) Fix problems with new bluebird library
 
