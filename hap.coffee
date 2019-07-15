@@ -59,7 +59,8 @@ module.exports = (env) =>
       'tradfridimmer-temp': DimmerAccessory
       'raspbee-dimmer': DimmerAccessory
       'raspbee-ct': DimmerAccessory
-      'raspbee-rgb': DimmerAccessory
+      'raspbee-rgb': HueLightAccessory
+      'raspbee-rgbct': HueLightAccessory
     }
 
     accessories: {}
