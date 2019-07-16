@@ -29,7 +29,7 @@ module.exports = (env) =>
   _ = require 'lodash'
 
   # bind hap-nodejs' debug logging to pimatic logger
-  Debug = require ('hap-nodejs/node_modules/debug')
+  Debug = require ('debug')
   Debug.log = env.logger.debug.bind(env.logger)
   Debug.formatArgs = () => arguments
 
