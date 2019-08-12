@@ -11,7 +11,8 @@ module.exports = (env) ->
   ##
   class GenericAccessory extends BaseAccessory
 
-    @supportedAttributes: ['temperature', 'humidity', 'co2', 'presence', 'contact', 'water', 'carbon', 'lux', 'fire']
+    @supportedAttributes: ['temperature', 'humidity', 'co2', 'presence',
+      'contact', 'water', 'carbon', 'lux', 'fire']
 
     constructor: (device) ->
       super(device)
