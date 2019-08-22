@@ -148,7 +148,8 @@ module.exports = (env) ->
         device.on 'lowBattery', (state) =>
           service
             .updateCharacteristic(Characteristic.StatusLowBattery, @getBatteryStatus(state))
-      if device.hasAttribute('battery')
+
+      else if device.hasAttribute('battery')
         service
           .getCharacteristic(Characteristic.StatusLowBattery)
           .on 'get', (callback) =>
