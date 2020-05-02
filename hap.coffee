@@ -17,6 +17,8 @@ module.exports = (env) =>
   ShutterAccessory = require('./accessories/shutter')(env)
   ThermostatAccessory = require('./accessories/thermostat')(env)
 
+  RaspBeeCTAccessory = require('./accessories/raspbeect')(env)
+
   crypto = env.require 'crypto'
   path = require 'path'
 
@@ -58,9 +60,10 @@ module.exports = (env) =>
       'tradfridimmer-rgb': DimmerAccessory
       'tradfridimmer-temp': DimmerAccessory
       'raspbee-dimmer': DimmerAccessory
-      'raspbee-ct': DimmerAccessory
+      'raspbee-ct': RaspBeeCTAccessory
       'raspbee-rgb': HueLightAccessory
       'raspbee-rgbct': HueLightAccessory
+      'raspbee-group-rgbct': HueLightAccessory
     }
 
     accessories: {}
