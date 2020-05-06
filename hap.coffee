@@ -27,7 +27,7 @@ module.exports = (env) =>
   Accessory = hap.Accessory
   Service = hap.Service
   Characteristic = hap.Characteristic
-  uuid = require ('hap-nodejs/lib/util/uuid')
+  uuid = require ('hap-nodejs/dist/lib/util/uuid')
   _ = require 'lodash'
 
   # bind hap-nodejs' debug logging to pimatic logger

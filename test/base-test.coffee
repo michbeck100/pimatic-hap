@@ -10,7 +10,7 @@ env =
 
 describe "base", ->
 
-  uuid = require ('hap-nodejs/lib/util/uuid')
+  uuid = require ('hap-nodejs/dist/lib/util/uuid')
   hap = require 'hap-nodejs'
   Service = hap.Service
   Characteristic = hap.Characteristic

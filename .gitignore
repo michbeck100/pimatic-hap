@@ -5,3 +5,8 @@ doc/*
 .idea/*
 coverage.html
 .DS_STORE
+.npm
+.node-gyp
+hap-database
+config.json
+*.sqlite

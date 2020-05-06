@@ -6,7 +6,7 @@ module.exports = (env) ->
   Accessory = hap.Accessory
   Service = hap.Service
   Characteristic = hap.Characteristic
-  uuid = require ('hap-nodejs/lib/util/uuid')
+  uuid = require ('hap-nodejs/dist/lib/util/uuid')
 
   # base class for all homekit accessories in pimatic
   class BaseAccessory extends Accessory
