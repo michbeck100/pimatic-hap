@@ -99,8 +99,13 @@ Do you like this plugin? Then consider a donation to support development.
 [![Flattr pimatic-hap](http://api.flattr.com/button/flattr-badge-large.png)](https://flattr.com/submit/auto?user_id=michbeck100&url=https://github.com/michbeck100/pimatic-hap&title=pimatic-hap&language=&tags=github&category=software)
 
 ### Changelog
+0.13.0
+* [#85](https://github.com/michbeck100/pimatic-hap/issues/85) Support for RaspBeeMultiDevice (Aqara door/window sensors)
+* Support for additional attributes (presence, contact, water, carbon, lux, fire)
+* Update to hap-nodejs 0.6.11, this drops support for Node 4
+
 0.12.0
-* [#81](https://github.com/michbeck100/pimatic-hap/issues/80) Add support for pimatic-raspbee
+* [#80](https://github.com/michbeck100/pimatic-hap/issues/80) Add support for pimatic-raspbee
 
 0.11.2
 * [#81](https://github.com/michbeck100/pimatic-hap/issues/81) Fix problems with new bluebird library
