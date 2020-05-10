@@ -90,6 +90,14 @@ Since the "hap" attribute doesn't belong to the device config schema, pimatic wi
 that this is an unknown config entry. Maybe it will be officially possible to extend the configuration. 
 Since then make sure that pimatic-hap is placed first in your config or just ignore this warning.
 
+### Debug logging
+
+To activate verbose debug logging in hap-nodejs, you have to start pimatic with
+
+```bash
+$ set DEBUG=HAPServer,Accessory,EventedHttpServer
+$ sudo service pimatic start
+```
 
 ### Sponsoring
 
@@ -103,6 +111,7 @@ Do you like this plugin? Then consider a donation to support development.
 * [#85](https://github.com/michbeck100/pimatic-hap/issues/85) Support for RaspBeeMultiDevice (Aqara door/window sensors)
 * Support for additional attributes (presence, contact, water, carbon, lux, fire)
 * Update to hap-nodejs 0.6.11, this drops support for Node 4
+* Debug logging in hap-nodejs must be enabled by environment variable due to updated dependency.
 
 0.12.0
 * [#80](https://github.com/michbeck100/pimatic-hap/issues/80) Add support for pimatic-raspbee
