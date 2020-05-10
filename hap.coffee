@@ -65,7 +65,14 @@ module.exports = (env) =>
 
       hap.init(path.resolve @framework.maindir, '../../hap-database')
 
-      bridge = new Bridge(@config.name, uuid.generate(@config.name))
+      serialNumber = uuid.generate(@config.name)
+      bridge = new Bridge(@config.name, serialNumber)
+
+      bridge.getService(Service.AccessoryInformation)
+        .setCharacteristic(Characteristic.Manufacturer, "Pimatic")
+        .setCharacteristic(Characteristic.Model, "pimatic-hap")
+        .setCharacteristic(Characteristic.SerialNumber, serialNumber)
+        .setCharacteristic(Characteristic.FirmwareRevision, require('./package.json').version)
 
       bridge.on 'identify', (paired, callback) =>
         env.logger.debug(@config.name + " identify")

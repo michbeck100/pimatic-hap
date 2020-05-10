@@ -31,8 +31,9 @@ module.exports = (env) ->
 
       @getService(Service.AccessoryInformation)
         .setCharacteristic(Characteristic.Manufacturer, "Pimatic")
-        .setCharacteristic(Characteristic.Model, "Rev-1")
+        .setCharacteristic(Characteristic.Model, device.class)
         .setCharacteristic(Characteristic.SerialNumber, serialNumber)
+        .setCharacteristic(Characteristic.FirmwareRevision, require('../package.json').version)
 
       bridgingState =  @addService(Service.BridgingState)
       bridgingState.getCharacteristic(Characteristic.Reachable)
