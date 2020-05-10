@@ -31,7 +31,7 @@ module.exports = (env) ->
 
       @getService(Service.AccessoryInformation)
         .setCharacteristic(Characteristic.Manufacturer, "Pimatic")
-        .setCharacteristic(Characteristic.Model, device.class)
+        .setCharacteristic(Characteristic.Model, device.config.class)
         .setCharacteristic(Characteristic.SerialNumber, serialNumber)
         .setCharacteristic(Characteristic.FirmwareRevision, require('../package.json').version)
 
