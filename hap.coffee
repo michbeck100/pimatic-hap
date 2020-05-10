@@ -13,10 +13,10 @@ module.exports = (env) =>
   PowerSwitchAccessory = require('./accessories/powerswitch')(env)
   ShutterAccessory = require('./accessories/shutter')(env)
   ThermostatAccessory = require('./accessories/thermostat')(env)
-
   RaspBeeCTAccessory = require('./accessories/raspbeect')(env)
 
   crypto = env.require 'crypto'
+  semver = env.require 'semver'
   path = require 'path'
 
   hap = require 'hap-nodejs'
@@ -97,14 +97,25 @@ module.exports = (env) =>
       @framework.once "after init", =>
         # publish homekit bridge
         env.logger.debug("publishing homekit bridge on port " + @config.port)
-        env.logger.debug("pincode is: " + @config.pincode)
+
+        # use default pincode if not already set for backwards compatibility with version 0.12.x
+        if !@config.pincode && semver.satisfies(require('./package.json').version, '0.13.0')
+          code = '031-45-154'
+        else
+          generator = new PincodeGenerator()
+          code = @config.pincode || generator.generate()
+          if generator.isInvalid(code)
+            env.logger.error("pincode #{code} is invalid, generating new pincode")
+            code = generator.generate()
+        env.logger.debug("pincode is: " + code)
 
         bridge.publish({
           username: @generateUniqueUsername(bridge.displayName),
           port: @config.port,
-          pincode: @config.pincode,
+          pincode: code
           category: Accessory.Categories.BRIDGE
         })
+        @config.pincode = code
 
       @framework.deviceManager.deviceConfigExtensions.push(new HapConfigExtension())
 
@@ -177,6 +188,37 @@ module.exports = (env) =>
       return yes
 
     apply: (config, device) -> # do nothing here
+
+  class PincodeGenerator
+
+    invalid = [
+      '000-00-000',
+      '111-11-111',
+      '222-22-222',
+      '333-33-333',
+      '444-44-444',
+      '555-55-555',
+      '666-66-666',
+      '777-77-777',
+      '888-88-888',
+      '999-99-999',
+      '123-45-678',
+      '876-54-321'
+    ]
+
+    generate: () =>
+      bytes = crypto.randomBytes(6)
+      code = @toString(bytes)
+      if @isInvalid(code) then @generate()
+      return code
+
+    isInvalid: (code) =>
+      return invalid.includes(code)
+
+    toString: (buffer) =>
+      return ('000' + buffer.readUInt16LE(0)).substr(-3) + '-' +
+        ('00' + buffer.readUInt16LE(2)).substr(-2) + '-' +
+        ('000' + buffer.readUInt16LE(4)).substr(-3)
 
   plugin = new HapPlugin()
 

@@ -112,6 +112,7 @@ Do you like this plugin? Then consider a donation to support development.
 * Support for additional attributes (presence, contact, water, carbon, lux, fire)
 * Update to hap-nodejs 0.6.11, this drops support for Node 4
 * Debug logging in hap-nodejs must be enabled by environment variable due to updated dependency.
+* Generate pin code on startup if no pincode found in config, or pincode is invalid
 
 0.12.0
 * [#80](https://github.com/michbeck100/pimatic-hap/issues/80) Add support for pimatic-raspbee

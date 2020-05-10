@@ -9,7 +9,7 @@ module.exports = {
     pincode:
       description: "The pincode used to pair the homekit bridge"
       type: "string"
-      default: "031-45-154"
+      default: ""
     port:
       description: "The network port that the bridge is using"
       type: "integer"
