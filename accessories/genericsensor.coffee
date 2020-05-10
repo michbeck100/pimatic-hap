@@ -30,6 +30,7 @@ module.exports = (env) ->
 
         @addBatteryStatus(device, @getService(Service.TemperatureSensor))
         @addRemoveListener(device, @getService(Service.TemperatureSensor))
+        env.logger.debug("#{device.name} added as temperature sensor")
 
       # some devices also measure humidity
       if device.hasAttribute('humidity')
@@ -44,6 +45,7 @@ module.exports = (env) ->
 
         @addBatteryStatus(device, @getService(Service.HumiditySensor))
         @addRemoveListener(device, @getService(Service.HumiditySensor))
+        env.logger.debug("#{device.name} added as humidity sensor")
 
       if device.hasAttribute('co2')
         @addService(Service.CarbonDioxideSensor)
@@ -63,7 +65,9 @@ module.exports = (env) ->
           @getService(Service.CarbonDioxideSensor)
             .updateCharacteristic(Characteristic.CarbonDioxideLevel, co2)
 
+        @addBatteryStatus(device, @getService(Service.CarbonDioxideSensor))
         @addRemoveListener(device, @getService(Service.CarbonDioxideSensor))
+        env.logger.debug("#{device.name} added as co2 sensor")
 
       if device.hasAttribute('presence')
         @addService(Service.MotionSensor, device.name)
@@ -77,6 +81,7 @@ module.exports = (env) ->
 
         @addBatteryStatus(device, @getService(Service.MotionSensor))
         @addRemoveListener(device, @getService(Service.MotionSensor))
+        env.logger.debug("#{device.name} added as presence sensor")
 
       if device.hasAttribute('contact')
         @addService(Service.ContactSensor, device.name)
@@ -89,6 +94,7 @@ module.exports = (env) ->
 
         @addBatteryStatus(device, @getService(Service.ContactSensor))
         @addRemoveListener(device, @getService(Service.ContactSensor))
+        env.logger.debug("#{device.name} added as contact sensor")
 
       if device.hasAttribute('water')
         @addService(Service.LeakSensor, device.name)
@@ -101,6 +107,7 @@ module.exports = (env) ->
 
         @addBatteryStatus(device, @getService(Service.LeakSensor))
         @addRemoveListener(device, @getService(Service.LeakSensor))
+        env.logger.debug("#{device.name} added as water sensor")
 
       if device.hasAttribute('carbon')
         @addService(Service.CarbonMonoxideSensor, device.name)
@@ -113,6 +120,7 @@ module.exports = (env) ->
 
         @addBatteryStatus(device, @getService(Service.CarbonMonoxideSensor))
         @addRemoveListener(device, @getService(Service.CarbonMonoxideSensor))
+        env.logger.debug("#{device.name} added as carbon monoxide sensor")
 
       if device.hasAttribute('lux')
         @addService(Service.LightSensor, device.name)
@@ -125,6 +133,7 @@ module.exports = (env) ->
 
         @addBatteryStatus(device, @getService(Service.LightSensor))
         @addRemoveListener(device, @getService(Service.LightSensor))
+        env.logger.debug("#{device.name} added as lux sensor")
 
       if device.hasAttribute('fire')
         @addService(Service.SmokeSensor, device.name)
@@ -137,6 +146,7 @@ module.exports = (env) ->
 
         @addBatteryStatus(device, @getService(Service.SmokeSensor))
         @addRemoveListener(device, @getService(Service.SmokeSensor))
+        env.logger.debug("#{device.name} added as fire sensor")
 
     addBatteryStatus: (device, service) =>
       if device.hasAttribute('lowBattery')
@@ -148,6 +158,7 @@ module.exports = (env) ->
         device.on 'lowBattery', (state) =>
           service
             .updateCharacteristic(Characteristic.StatusLowBattery, @getBatteryStatus(state))
+        env.logger.debug("#{device.name} added with lowBattery sensor")
 
       else if device.hasAttribute('battery')
         service
@@ -158,6 +169,7 @@ module.exports = (env) ->
         device.on 'battery', (value) =>
           service
             .updateCharacteristic(Characteristic.StatusLowBattery, @isBatteryLow(value))
+        env.logger.debug("#{device.name} added with battery sensor")
 
     # lowBattery if battery value is < 20%
     isBatteryLow: (value) =>
