@@ -17,6 +17,7 @@ module.exports = (env) =>
 
   crypto = env.require 'crypto'
   semver = env.require 'semver'
+  Promise = env.require 'bluebird'
   path = require 'path'
 
   hap = require 'hap-nodejs'
@@ -62,6 +63,13 @@ module.exports = (env) =>
 
     init: (app, @framework, @config) =>
       env.logger.info("Starting homekit bridge")
+
+      deviceConfigDef = require("./device-config-schema.coffee")
+      @framework.deviceManager.registerDeviceClass("HomekitBridge", {
+        configDef: deviceConfigDef.HomekitBridge,
+        createCallback: (config, lastState) =>
+          return new HomekitBridge(config, @config.pincode)
+      })
 
       hap.init(path.resolve @framework.maindir, '../../hap-database')
 
@@ -219,6 +227,30 @@ module.exports = (env) =>
       return ('000' + buffer.readUInt16LE(0)).substr(-3) + '-' +
         ('00' + buffer.readUInt16LE(2)).substr(-2) + '-' +
         ('000' + buffer.readUInt16LE(4)).substr(-3)
+
+  class HomekitBridge extends env.devices.Device
+    attributes:
+      pincode:
+        description: "The pincode for the Homekit Bridge"
+        type: "string"
+      qRCode:
+        description: "Base64-encoded image used as qr-code"
+        type: "string"
+
+    constructor: (@config, @pincode) ->
+      @name = @config.name
+      @id = @config.id
+      super()
+
+    getPincode: () =>
+      return Promise.resolve(@pincode)
+
+    getQRCode: () =>
+      return Promise.resolve(@_generateQRCode())
+
+    _generateQRCode: () =>
+      # TODO: Generate qr code image
+      return Buffer.from(@pincode).toString("base64")
 
   plugin = new HapPlugin()
 
