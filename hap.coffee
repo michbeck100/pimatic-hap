@@ -213,7 +213,7 @@ module.exports = (env) =>
       return code
 
     isInvalid: (code) =>
-      return invalid.includes(code)
+      return !code.match(/(\d{3}-\d{2}-\d{3})/i) || invalid.includes(code)
 
     toString: (buffer) =>
       return ('000' + buffer.readUInt16LE(0)).substr(-3) + '-' +
