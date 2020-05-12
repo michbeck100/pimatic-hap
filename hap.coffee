@@ -120,9 +120,12 @@ module.exports = (env) =>
           mobileFrontend.registerAssetFile 'html', "pimatic-hap/app/hap-template.jade"
           mobileFrontend.registerAssetFile 'css', "pimatic-hap/app/hap.css"
 
-      deviceConfigDef = require("./device-config-schema.coffee")
       @framework.deviceManager.registerDeviceClass("HomekitBridge", {
-        configDef: deviceConfigDef.HomekitBridge,
+        configDef: {
+          title: "Homekit Bridge Device"
+          type: "object"
+          properties: {}
+        },
         createCallback: (config, lastState) =>
           return new HomekitBridge(config, @config.name, @config.pincode, bridge)
       })
