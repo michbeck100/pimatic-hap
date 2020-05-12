@@ -31,7 +31,7 @@ module.exports = (env) =>
   # qr code generation
   QRCode = require 'qrcode-svg'
   Canvas = require 'canvas'
-  Canvas.registerFont('./app/static/Roboto-Bold.ttf', { family: 'Roboto'})
+  Canvas.registerFont(path.join(__dirname, '/app/static/', 'Roboto-Bold.ttf'), { family: 'Roboto'})
 
   class HapPlugin extends env.plugins.Plugin
 
@@ -280,7 +280,7 @@ module.exports = (env) =>
       ctx = canvas.getContext("2d")
 
       background = new Canvas.Image()
-      background.src = './app/static/qrcode.png'
+      background.src = path.join(__dirname, '/app/static/', 'qrcode.png')
       ctx.clearRect(0, 0, canvas.width, canvas.height)
       ctx.drawImage(background, 0, 0, canvas.width, canvas.height)
 
