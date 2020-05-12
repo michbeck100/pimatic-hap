@@ -107,6 +107,9 @@ Do you like this plugin? Then consider a donation to support development.
 [![Flattr pimatic-hap](http://api.flattr.com/button/flattr-badge-large.png)](https://flattr.com/submit/auto?user_id=michbeck100&url=https://github.com/michbeck100/pimatic-hap&title=pimatic-hap&language=&tags=github&category=software)
 
 ### Changelog
+0.14.0
+* New device HomekitBridge, which renders a homekit-compatible QR code for pairing when added to pimatic.  
+
 0.13.0
 * [#85](https://github.com/michbeck100/pimatic-hap/issues/85) Support for RaspBeeMultiDevice (Aqara door/window sensors)
 * Support for additional attributes (presence, contact, water, carbon, lux, fire)

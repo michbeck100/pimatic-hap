@@ -27,7 +27,11 @@ module.exports = (env) =>
   Characteristic = hap.Characteristic
   uuid = require ('hap-nodejs/dist/lib/util/uuid')
   _ = require 'lodash'
+
+  # qr code generation
   QRCode = require 'qrcode-svg'
+  Canvas = require 'canvas'
+  Canvas.registerFont('./app/static/Roboto-Bold.ttf', { family: 'Roboto'})
 
   class HapPlugin extends env.plugins.Plugin
 
@@ -76,6 +80,9 @@ module.exports = (env) =>
         .setCharacteristic(Characteristic.SerialNumber, serialNumber)
         .setCharacteristic(Characteristic.FirmwareRevision, require('./package.json').version)
 
+      @config.pincode = @generatePincode()
+      env.logger.debug("pincode is: " + @config.pincode)
+
       bridge.on 'identify', (paired, callback) =>
         env.logger.debug(@config.name + " identify")
         callback()
@@ -100,24 +107,12 @@ module.exports = (env) =>
         # publish homekit bridge
         env.logger.debug("publishing homekit bridge on port " + @config.port)
 
-        # use default pincode if not already set for backwards compatibility with version 0.12.x
-        if !@config.pincode && semver.satisfies(require('./package.json').version, '0.13.0')
-          code = '031-45-154'
-        else
-          generator = new PincodeGenerator()
-          code = @config.pincode || generator.generate()
-          if generator.isInvalid(code)
-            env.logger.error("pincode #{code} is invalid, generating new pincode")
-            code = generator.generate()
-        env.logger.debug("pincode is: " + code)
-
         bridge.publish({
           username: @generateUniqueUsername(bridge.displayName),
           port: @config.port,
-          pincode: code,
+          pincode: @config.pincode,
           category: Accessory.Categories.BRIDGE
         })
-        @config.pincode = code
 
         mobileFrontend = @framework.pluginManager.getPlugin 'mobile-frontend'
         if mobileFrontend?
@@ -133,6 +128,19 @@ module.exports = (env) =>
       })
 
       @framework.deviceManager.deviceConfigExtensions.push(new HapConfigExtension())
+
+    generatePincode: () =>
+      # use default pincode if not already set for backwards compatibility with version 0.12.x
+      if !@config.pincode && semver.satisfies(require('./package.json').version, '0.13.x || 0.14.x')
+        env.logger.debug 'using default pincode for backward compatibility reasons'
+        code = '031-45-154'
+      else
+        generator = new PincodeGenerator()
+        code = @config.pincode || generator.generate()
+        if generator.isInvalid(code)
+          env.logger.error("pincode #{code} is invalid, generating new pincode")
+          code = generator.generate()
+      return code
 
     generateUniqueUsername: (name) =>
       shasum = crypto.createHash('sha1')
@@ -248,25 +256,44 @@ module.exports = (env) =>
       @name = @displayName
       super()
       @bridge.on "listening", () =>
-        @image = @generateQRCode(@bridge.setupURI())
+        @image = @generateQRCode(@bridge.setupURI(), @pincode)
         @emit "image", @image
 
     getImage:() =>
       return @image
 
-    generateQRCode: (uri) =>
+    generateQRCode: (uri, code) =>
       env.logger.debug "generating qr code for #{uri}"
       qrcode = new QRCode({
         content: uri,
-        padding: 4,
-        width: 256,
-        height: 256,
+        padding: 0,
+        width: 300,
+        height: 300,
         color: "#000000",
         background: "#ffffff",
         ecl: "M",
       })
-      svg = qrcode.svg()
-      return "data:image/svg+xml;base64," + Buffer.from(svg).toString("base64")
+      # remove minus from code
+      code = code.split('-').join('')
+
+      canvas = Canvas.createCanvas(400, 530)
+      ctx = canvas.getContext("2d")
+
+      background = new Canvas.Image()
+      background.src = './app/static/qrcode.png'
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.drawImage(background, 0, 0, canvas.width, canvas.height);
+
+      qrcodeImg = new Canvas.Image()
+      qrcodeImg.src = Buffer.from(qrcode.svg())
+      ctx.drawImage(qrcodeImg, 50, 180, 300, 300);
+
+      ctx.font = '42pt Roboto'
+      for i in [0...4]
+        ctx.fillText(code.charAt(i), 170 + i * 50, 90)
+        ctx.fillText(code.charAt(i + 4), 170 + i * 50, 150)
+
+      return "data:image/png;base64," + canvas.toBuffer().toString("base64")
 
     destroy: () =>
       super()
