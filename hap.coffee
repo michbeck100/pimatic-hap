@@ -281,12 +281,12 @@ module.exports = (env) =>
 
       background = new Canvas.Image()
       background.src = './app/static/qrcode.png'
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      ctx.drawImage(background, 0, 0, canvas.width, canvas.height);
+      ctx.clearRect(0, 0, canvas.width, canvas.height)
+      ctx.drawImage(background, 0, 0, canvas.width, canvas.height)
 
       qrcodeImg = new Canvas.Image()
       qrcodeImg.src = Buffer.from(qrcode.svg())
-      ctx.drawImage(qrcodeImg, 50, 180, 300, 300);
+      ctx.drawImage(qrcodeImg, 50, 180, 300, 300)
 
       ctx.font = '42pt Roboto'
       for i in [0...4]
