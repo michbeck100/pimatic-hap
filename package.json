@@ -5,6 +5,7 @@
   "main": "hap.coffee",
   "files": [
     "accessories",
+    "app",
     "test",
     "hap.coffee",
     "README.md",
@@ -25,7 +26,8 @@
   "dependencies": {
     "color-convert": "1.0.0",
     "hap-nodejs": "^0.6.11",
-    "lodash": "^4.17.13"
+    "lodash": "^4.17.13",
+    "qrcode-svg": "^1.1.0"
   },
   "devDependencies": {
     "blanket": "^1.2.2",

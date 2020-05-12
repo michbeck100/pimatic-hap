@@ -27,6 +27,7 @@ module.exports = (env) =>
   Characteristic = hap.Characteristic
   uuid = require ('hap-nodejs/dist/lib/util/uuid')
   _ = require 'lodash'
+  QRCode = require 'qrcode-svg'
 
   class HapPlugin extends env.plugins.Plugin
 
@@ -63,13 +64,6 @@ module.exports = (env) =>
 
     init: (app, @framework, @config) =>
       env.logger.info("Starting homekit bridge")
-
-      deviceConfigDef = require("./device-config-schema.coffee")
-      @framework.deviceManager.registerDeviceClass("HomekitBridge", {
-        configDef: deviceConfigDef.HomekitBridge,
-        createCallback: (config, lastState) =>
-          return new HomekitBridge(config, @config.pincode)
-      })
 
       hap.init(path.resolve @framework.maindir, '../../hap-database')
 
@@ -120,10 +114,23 @@ module.exports = (env) =>
         bridge.publish({
           username: @generateUniqueUsername(bridge.displayName),
           port: @config.port,
-          pincode: code
+          pincode: code,
           category: Accessory.Categories.BRIDGE
         })
         @config.pincode = code
+
+        mobileFrontend = @framework.pluginManager.getPlugin 'mobile-frontend'
+        if mobileFrontend?
+          mobileFrontend.registerAssetFile 'js', "pimatic-hap/app/hap-page.coffee"
+          mobileFrontend.registerAssetFile 'html', "pimatic-hap/app/hap-template.jade"
+          mobileFrontend.registerAssetFile 'css', "pimatic-hap/app/hap.css"
+
+      deviceConfigDef = require("./device-config-schema.coffee")
+      @framework.deviceManager.registerDeviceClass("HomekitBridge", {
+        configDef: deviceConfigDef.HomekitBridge,
+        createCallback: (config, lastState) =>
+          return new HomekitBridge(config, @config.name, @config.pincode, bridge)
+      })
 
       @framework.deviceManager.deviceConfigExtensions.push(new HapConfigExtension())
 
@@ -229,28 +236,40 @@ module.exports = (env) =>
         ('000' + buffer.readUInt16LE(4)).substr(-3)
 
   class HomekitBridge extends env.devices.Device
+    template: "hap"
+
     attributes:
-      pincode:
-        description: "The pincode for the Homekit Bridge"
-        type: "string"
-      qRCode:
+      image:
         description: "Base64-encoded image used as qr-code"
         type: "string"
 
-    constructor: (@config, @pincode) ->
-      @name = @config.name
+    constructor: (@config, @displayName, @pincode, @bridge) ->
       @id = @config.id
+      @name = @displayName
       super()
+      @bridge.on "listening", () =>
+        @image = @generateQRCode(@bridge.setupURI())
+        @emit "image", @image
 
-    getPincode: () =>
-      return Promise.resolve(@pincode)
+    getImage:() =>
+      return @image
 
-    getQRCode: () =>
-      return Promise.resolve(@_generateQRCode())
+    generateQRCode: (uri) =>
+      env.logger.debug "generating qr code for #{uri}"
+      qrcode = new QRCode({
+        content: uri,
+        padding: 4,
+        width: 256,
+        height: 256,
+        color: "#000000",
+        background: "#ffffff",
+        ecl: "M",
+      })
+      svg = qrcode.svg()
+      return "data:image/svg+xml;base64," + Buffer.from(svg).toString("base64")
 
-    _generateQRCode: () =>
-      # TODO: Generate qr code image
-      return Buffer.from(@pincode).toString("base64")
+    destroy: () =>
+      super()
 
   plugin = new HapPlugin()
 
