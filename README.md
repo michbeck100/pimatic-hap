@@ -48,7 +48,7 @@ If you are the developer of a pimatic plugin that defines a new device class, th
 
 Since this plugin uses [HAP-NodeJS](https://github.com/KhaosT/HAP-NodeJS), libnss-mdns and libavahi-compat-libdnssd-dev must be installed on a raspberry pi:
 
-    sudo apt-get install libnss-mdns libavahi-compat-libdnssd-dev
+    sudo apt-get install libnss-mdns libavahi-compat-libdnssd-dev libcairo2-dev libpango1.0-dev libjpeg-dev libgif-dev librsvg2-dev
 
 To install the plugin just add the plugin to the config.json of pimatic:
 
