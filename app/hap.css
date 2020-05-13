@@ -1,4 +1,5 @@
-ul.items .hap-device .hap {
-    height: 50%;
-    width: 50%;
+ul.items .device .hap {
+    float: right;
+    height: 25%;
+    width: 25%;
 }

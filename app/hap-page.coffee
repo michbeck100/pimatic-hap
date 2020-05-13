@@ -4,15 +4,16 @@ $(document).on 'templateinit', (event) ->
 
     constructor: (templData, @device) ->
       super(templData, @device)
-      attribute = @getAttribute("image")
-      @image = ko.observable attribute.value()
-      attribute.value.subscribe (newValue) =>
-        @image newValue
 
     destroy: ->
       super()
 
     afterRender: (elements) =>
       super(elements)
+      renderImage = (image) =>
+        $(elements).find('img').attr('src', 'data:image/png;base64,' + image)
+
+      renderImage(@getAttribute('image').value())
+      @getAttribute('image').value.subscribe(renderImage)
 
   pimatic.templateClasses['hap'] = HomekitBridgeDeviceItem

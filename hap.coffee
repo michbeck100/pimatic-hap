@@ -127,7 +127,7 @@ module.exports = (env) =>
           properties: {}
         },
         createCallback: (config, lastState) =>
-          return new HomekitBridge(config, @config.name, @config.pincode, bridge)
+          return new HomekitBridge(config, @config.pincode, bridge)
       })
 
       @framework.deviceManager.deviceConfigExtensions.push(new HapConfigExtension())
@@ -254,9 +254,9 @@ module.exports = (env) =>
         description: "Base64-encoded image used as qr-code"
         type: "string"
 
-    constructor: (@config, @displayName, @pincode, @bridge) ->
+    constructor: (@config, @pincode, @bridge) ->
       @id = @config.id
-      @name = @displayName
+      @name = @config.name
       super()
       @bridge.on "listening", () =>
         @image = @generateQRCode(@bridge.setupURI(), @pincode)
@@ -296,7 +296,7 @@ module.exports = (env) =>
         ctx.fillText(code.charAt(i), 170 + i * 50, 90)
         ctx.fillText(code.charAt(i + 4), 170 + i * 50, 150)
 
-      return "data:image/png;base64," + canvas.toBuffer().toString("base64")
+      return canvas.toBuffer().toString("base64")
 
     destroy: () =>
       super()

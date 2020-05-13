@@ -1,5 +1,6 @@
 script#hap-template(type='text/template')
-    li.sortable.no-header.hap-device
+    li.sortable.no-header.device
         div.item-inner
             label.device-label(data-bind="text: name, tooltip: $data.labelTooltipHtml")
-            img.hap(data-bind="attr:{ src: image }")
+            img.hap
+            span.error(data-bind="text: ($data.error() ? $data.error() : '') ")
