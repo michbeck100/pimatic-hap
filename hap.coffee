@@ -259,10 +259,13 @@ module.exports = (env) =>
       @name = @config.name
       super()
       @bridge.on "listening", () =>
+        @ready = true
         @image = @generateQRCode(@bridge.setupURI(), @pincode)
         @emit "image", @image
 
     getImage:() =>
+      if @ready
+        @image = @generateQRCode(@bridge.setupURI(), @pincode)
       return @image
 
     generateQRCode: (uri, code) =>
