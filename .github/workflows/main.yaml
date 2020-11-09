@@ -5,7 +5,7 @@ on: [push]
 jobs:
   build:
 
-    runs-on: debian:buster-slim
+    runs-on: ubuntu-latest
 
     strategy:
       matrix:
