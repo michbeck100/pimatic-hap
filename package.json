@@ -25,7 +25,7 @@
   },
   "dependencies": {
     "color-convert": "1.0.0",
-    "hap-nodejs": "^0.6.11",
+    "hap-nodejs": "^0.8.2",
     "lodash": "^4.17.13",
     "qrcode-svg": "^1.1.0",
     "canvas": "^2.6.1"
