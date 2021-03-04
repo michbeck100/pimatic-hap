@@ -7,7 +7,6 @@ module.exports = (env) ->
   SwitchAccessory = require('./switch')(env)
 
   class WooxRGBWLightAccessory extends SwitchAccessory
-    # hsb value of current color
     _color: {
       h: null
       s: null
@@ -38,7 +37,7 @@ module.exports = (env) ->
           @handleVoidPromise(device.changeHueTo(hue), callback)
 
       device.on 'hue', (hue) =>
-        console.log("Hue received from Device: #{hue}")
+        env.logger.debug("Hue received from Device: #{hue}")
         @service.updateCharacteristic(Characteristic.Hue, hue)
 
       @service.getCharacteristic(Characteristic.Saturation)
@@ -54,7 +53,7 @@ module.exports = (env) ->
           @handleVoidPromise(device.changeSaturationTo(saturation), callback)
 
       device.on 'saturation', (saturation) =>
-        console.log("Saturation received from Device: #{saturation}")
+        env.logger.debug("Saturation received from Device: #{saturation}")
         @service.updateCharacteristic(Characteristic.Saturation, saturation)
       
       @service.getCharacteristic(Characteristic.Brightness)
@@ -69,21 +68,14 @@ module.exports = (env) ->
           
           @_color.b = brightness
           @_dimlevel = brightness
-          #if @_color.h is 0 && @_color.s is 0 && @_color.b is 100
-          if brightness is 1
-            @handleVoidPromise(device.changeDimlevelTo(brightness), callback)
-          
-          else
-            @handleVoidPromise(device.changeBrightnessTo(brightness), callback)
+          @handleVoidPromise(device.changeBrightnessTo(brightness), callback)
 
       device.on 'brightness', (brightness) =>
-        console.log("Brightness received from Device: #{brightness}")
+        env.logger.debug("Brightness received from Device: #{brightness}")
         @service.updateCharacteristic(Characteristic.Brightness, brightness)
       
       device.on 'dimlevel', (dimlevel) =>
-        console.log("Dimlevel received from Device: #{dimlevel}")
+        env.logger.debug("Dimlevel received from Device: #{dimlevel}")
         @service.updateCharacteristic(Characteristic.Brightness, dimlevel)
-        @service.updateCharacteristic(Characteristic.Saturation, 0)
-        @service.updateCharacteristic(Characteristic.Hue, 0)
         
 
