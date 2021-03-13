@@ -38,6 +38,7 @@ Currently this applies to
 * [pimatic-netatmo](https://github.com/thexperiments/pimatic-netatmo) - A pimatic plugin for supporting Netatmo Weather devices
 * [pimatic-tradfri](https://github.com/treban/pimatic-tradfri) - A pimatic plugin for supporting IKEA Tradfri LED light bulbs
 * [pimatic-raspbee](https://github.com/treban/pimatic-raspbee) - Provides a raspbee interface for pimatic
+* [pimatic-woox](https://github.com/sentzu01/pimatic-woox) - A pimatic plugin to control WiFi based Woox LED bulbs and potentially others based on the Tuya protocol.
 
 Note: not all devices that these plugins provide work with pimatic-hap.
 
@@ -106,6 +107,12 @@ Do you like this plugin? Then consider a donation to support development.
 [![Flattr pimatic-hap](http://api.flattr.com/button/flattr-badge-large.png)](https://flattr.com/submit/auto?user_id=michbeck100&url=https://github.com/michbeck100/pimatic-hap&title=pimatic-hap&language=&tags=github&category=software)
 
 ### Changelog
+0.15.0
+* [#90](https://github.com/michbeck100/pimatic-hap/pull/90) Support for Woox RGBW lights (pimatic-woox)
+* Update to hap-nodejs:0.8.2
+* [#86](https://github.com/michbeck100/pimatic-hap/issues/86) Update to lodash:^4.17.19
+* [#87](https://github.com/michbeck100/pimatic-hap/issues/87) move to GitHub actions
+
 0.14.0
 * New device HomekitBridge, which renders a homekit-compatible QR code for pairing when added to pimatic.  
 
